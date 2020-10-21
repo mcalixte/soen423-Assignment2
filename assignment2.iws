@@ -1,0 +1,188 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ChangeListManager">
+    <list default="true" id="8f014d95-5c2f-4098-949b-14d7985b2f60" name="Default Changelist" comment="" />
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Class" />
+      </list>
+    </option>
+  </component>
+  <component name="ProjectId" id="1jAdMWWFewjE32MdRi3EYBQbNpy" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">
+    <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
+  </component>
+  <component name="RunManager" selected="Application.QuebecServer">
+    <configuration name="BritishColumbiaServer" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="implementation.servers.bc.BritishColumbiaServer" />
+      <module name="assignment2" />
+      <option name="PROGRAM_PARAMETERS" value="-ORBInitialPort 1050 -ORBInitialHost localhost" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="implementation.servers.bc.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="Client" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="implementation.clients.Client" />
+      <module name="assignment2" />
+      <option name="PROGRAM_PARAMETERS" value="-ORBInitialPort 1050 -ORBInitialHost localhost" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="implementation.clients.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="OntarioServer" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="implementation.servers.on.OntarioServer" />
+      <module name="assignment2" />
+      <option name="PROGRAM_PARAMETERS" value="-ORBInitialPort 1050 - ORBInitialHost localhost" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="implementation.servers.on.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="QuebecServer" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="implementation.servers.qc.QuebecServer" />
+      <module name="assignment2" />
+      <option name="PROGRAM_PARAMETERS" value="-ORBInitialPort 1050 - ORBInitialHost localhost" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="implementation.servers.qc.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <list>
+      <item itemvalue="Application.BritishColumbiaServer" />
+      <item itemvalue="Application.QuebecServer" />
+      <item itemvalue="Application.OntarioServer" />
+      <item itemvalue="Application.Client" />
+    </list>
+    <recent_temporary>
+      <list>
+        <item itemvalue="Application.BritishColumbiaServer" />
+        <item itemvalue="Application.Client" />
+        <item itemvalue="Application.OntarioServer" />
+        <item itemvalue="Application.QuebecServer" />
+      </list>
+    </recent_temporary>
+  </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="8f014d95-5c2f-4098-949b-14d7985b2f60" name="Default Changelist" comment="" />
+      <created>1603250782391</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1603250782391</updated>
+    </task>
+    <servers />
+  </component>
+  <component name="WindowStateProjectService">
+    <state x="0" y="24" width="1920" height="1056" key="#com.intellij.execution.impl.EditConfigurationsDialog" timestamp="1603262435398">
+      <screen x="0" y="24" width="1920" height="1056" />
+    </state>
+    <state x="0" y="24" width="1920" height="1056" key="#com.intellij.execution.impl.EditConfigurationsDialog/0.24.1920.1056@0.24.1920.1056" timestamp="1603262435398" />
+    <state x="773" y="246" key="#com.intellij.ide.util.MemberChooser" timestamp="1603254245326">
+      <screen x="0" y="24" width="1920" height="1056" />
+    </state>
+    <state x="773" y="246" key="#com.intellij.ide.util.MemberChooser/0.24.1920.1056@0.24.1920.1056" timestamp="1603254245326" />
+    <state x="698" y="288" key="#com.intellij.refactoring.safeDelete.UnsafeUsagesDialog" timestamp="1603253707548">
+      <screen x="0" y="24" width="1920" height="1056" />
+    </state>
+    <state x="698" y="288" key="#com.intellij.refactoring.safeDelete.UnsafeUsagesDialog/0.24.1920.1056@0.24.1920.1056" timestamp="1603253707548" />
+    <state width="1874" height="280" key="GridCell.Tab.0.bottom" timestamp="1603264408444">
+      <screen x="0" y="24" width="1920" height="1056" />
+    </state>
+    <state width="1874" height="280" key="GridCell.Tab.0.bottom/0.24.1920.1056@0.24.1920.1056" timestamp="1603264408444" />
+    <state width="1874" height="280" key="GridCell.Tab.0.center" timestamp="1603264408442">
+      <screen x="0" y="24" width="1920" height="1056" />
+    </state>
+    <state width="1874" height="280" key="GridCell.Tab.0.center/0.24.1920.1056@0.24.1920.1056" timestamp="1603264408442" />
+    <state width="1874" height="280" key="GridCell.Tab.0.left" timestamp="1603264408441">
+      <screen x="0" y="24" width="1920" height="1056" />
+    </state>
+    <state width="1874" height="280" key="GridCell.Tab.0.left/0.24.1920.1056@0.24.1920.1056" timestamp="1603264408441" />
+    <state width="1874" height="280" key="GridCell.Tab.0.right" timestamp="1603264408443">
+      <screen x="0" y="24" width="1920" height="1056" />
+    </state>
+    <state width="1874" height="280" key="GridCell.Tab.0.right/0.24.1920.1056@0.24.1920.1056" timestamp="1603264408443" />
+  </component>
+  <component name="simpleUML.UMLToolWindowPlugin">
+    <General>
+      <option name="birdViewUpdateDelay" value="2000" />
+      <option name="defaultFileLocation" value="file://$PROJECT_DIR$/.." />
+    </General>
+    <Classdiagram>
+      <option name="diagramTitleFont" value="SansSerif,1,12" />
+      <option name="diagramFont" value="SansSerif,0,10" />
+      <option name="defaultFieldsExpanded" value="false" />
+      <option name="defaultContructorsExpanded" value="false" />
+      <option name="defaultMethodsExpanded" value="false" />
+      <option name="showParameters" value="true" />
+      <option name="showTooltip" value="true" />
+      <option name="showReturnValues" value="true" />
+      <option name="longModifier" value="true" />
+      <option name="implementsBehaviour" value="1" />
+      <option name="extendsBehaviour" value="1" />
+      <option name="compartmentBehaviour" value="1" />
+      <option name="interfaceBackgroundColor" value="-6494306" />
+      <option name="abstractClassBackgroundColor" value="-1580132" />
+      <option name="classBackgroundColor" value="-6508057" />
+      <option name="diagramBackgroundColor" value="-1" />
+      <option name="useAntialiasedConnectors" value="true" />
+      <option name="quickSourceLinkColor" value="-16776961" />
+      <option name="quickDiagramLinkColor" value="-8454144" />
+      <option name="drawDecorations" value="false" />
+      <option name="hideFieldList" value="" />
+      <option name="showFieldList" value="" />
+      <option name="hideConstructorList" value="" />
+      <option name="showConstructorList" value="" />
+      <option name="hideMethodList" value="" />
+      <option name="showMethodList" value="" />
+      <option name="minimumFigureSize" value="0,0" />
+    </Classdiagram>
+    <Dependencydiagram>
+      <option name="diagramTitleFont" value="SansSerif,1,12" />
+      <option name="diagramFont" value="SansSerif,0,10" />
+      <option name="diagramBackgroundColor" value="-1" />
+      <option name="useAntialiasedConnectors" value="true" />
+      <option name="packageNameCompressionLevel" value="0" />
+    </Dependencydiagram>
+    <Packagediagram>
+      <option name="diagramTitleFont" value="SansSerif,0,12" />
+      <option name="diagramFont" value="SansSerif,0,10" />
+      <option name="packageBackgroundColor" value="-4144960" />
+      <option name="diagramBackgroundColor" value="-1" />
+      <option name="useAntialiasedConnectors" value="true" />
+      <option name="packageNameCompressionLevel" value="2" />
+    </Packagediagram>
+  </component>
+</project>
