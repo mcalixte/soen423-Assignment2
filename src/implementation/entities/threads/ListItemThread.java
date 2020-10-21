@@ -47,7 +47,7 @@ public class ListItemThread extends Thread {
                 System.out.println("Sent packet");
                 // now send acknowledgement packet back to sender
             } catch (IOException e) {
-                e.printStackTrace();
+               System.out.println("ListItemThread Exception: " + e);
             }
 
         }

@@ -11,11 +11,13 @@ import implementation.utils.helpers.ManagerHelper;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
+import implementation.utils.logger.Logger;
 import org.omg.CORBA.*;
 
 public class StoreImpl extends StorePOA {
@@ -56,8 +58,9 @@ public class StoreImpl extends StorePOA {
 
     public StoreImpl(String provinceID) {
         this.provinceID = provinceID;
-        clientHelper = new ClientHelper();
-        managerHelper = new ManagerHelper();
+        this.clientHelper = new ClientHelper(this.provinceID);
+        this.managerHelper = new ManagerHelper(this.provinceID);
+
         openAllPorts(this.provinceID);
     }
     @Override
@@ -91,13 +94,46 @@ public class StoreImpl extends StorePOA {
     }
 
     @Override
-    public void requestUpdateOfCustomerBudgetLog(String customerID, double price) {
-
+    public void requestUpdateOfCustomerBudgetLog(String customerID, double price) { //TODO CHange the name OF THIS METHOD
+        switch (this.provinceID.toLowerCase()) {
+            case "qc":
+                getClientHelper().sendCustomerBudgetUpdate(ontarioCustomerBudgetPort, customerID, price, this);
+                getClientHelper().sendCustomerBudgetUpdate(britishColumbiaCustomerBudgetPort, customerID, price, this);
+                break;
+            case "on":
+                getClientHelper().sendCustomerBudgetUpdate(quebecCustomerBudgetPort, customerID, price, this);
+                getClientHelper().sendCustomerBudgetUpdate(britishColumbiaCustomerBudgetPort, customerID, price, this);
+                break;
+            case "bc":
+                getClientHelper().sendCustomerBudgetUpdate(britishColumbiaCustomerBudgetPort, customerID, price, this);
+                getClientHelper().sendCustomerBudgetUpdate(quebecCustomerBudgetPort, customerID, price, this);
+                break;
+        }
     }
 
     @Override
     public boolean waitList(String customerID, String itemID, String dateOfPurchase) {
-        return false;
+        Boolean isWaitListed = false;
+        //if(getCustomerBudgetLog().get(customerID.toLowerCase())  ) //TODO Move logic for deciding to put person on waiutlist here, check their budget AND if they're foreign and bought here before
+        if(itemWaitList.containsKey(itemID)) {
+            itemWaitList.get(itemID).add(customerID);
+
+            String logString = ">>" +new SimpleDateFormat("MM/dd/yyyy HH:mm:ssZ").format(new Date())+" << Task SUCCESSFUL: Waitlisted customer:" + customerID + " for the item: "+itemID;
+            Logger.writeStoreLog(this.provinceID, logString);
+            Logger.writeUserLog(customerID, logString);
+            isWaitListed = true;
+        }
+        else {
+            List<String> listOfCustomers = new ArrayList<>();
+            listOfCustomers.add(customerID);
+            itemWaitList.put(itemID, listOfCustomers);
+
+            String logString = ">>" +new SimpleDateFormat("MM/dd/yyyy HH:mm:ssZ").format(new Date())+" << Task SUCCESSFUL: Waitlisted customer:" + customerID + " for the item: "+itemID;
+            Logger.writeStoreLog(this.provinceID, logString);
+            Logger.writeUserLog(customerID, logString);
+            isWaitListed = true;
+        }
+        return isWaitListed;
     }
 
     @Override
@@ -125,7 +161,7 @@ public class StoreImpl extends StorePOA {
             case "bc":
                 openListItemUDPPort(britishColumbiaListItemUDPPort);
                 openPurchaseItemUDPPort(britishColumbiaPurchaseItemUDPPort);
-                //openUpdateCustomerBudgetLogUDPPort(britishColumbiaCustomerBudgetPort);
+                openUpdateCustomerBudgetLogUDPPort(britishColumbiaCustomerBudgetPort);
                 break;
         }
     }
@@ -139,7 +175,7 @@ public class StoreImpl extends StorePOA {
 
             System.out.printf("Listening on udp:%s:%d%n", InetAddress.getLocalHost().getHostAddress(), updPort);
             DatagramPacket receivePacket = new DatagramPacket(receiveData, receiveData.length);
-            // System.out.println("Opening UDP ports for store");
+
             ListItemThread thread = new ListItemThread(serverSocket, receivePacket, this);
             thread.start();
         } catch (Exception e) {

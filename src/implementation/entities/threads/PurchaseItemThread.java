@@ -54,7 +54,7 @@ public class PurchaseItemThread extends Thread {
                 serverSocket.send(sendPacket); //TODO It is now sending a boolean
                 System.out.println("Item sent to the store that made the request ...");
             } catch (Exception e) {
-                e.printStackTrace();
+                System.out.println("PurchaseItem Exception: " + e);
             }
 
 
