@@ -25,14 +25,14 @@ public class ClientHelper {
         Date dateOfPurchaseDateObject =  DateUtils.createDateFromString(dateOfPurchase);
         Boolean isItemSuccessfullyPurchased = false;
         Item purchasedItem;
-        if (!ClientUtils.verifyID(customerID))
+        if (!ClientUtils.verifyID(customerID, this.provinceID))
             if (store.getCustomerPurchaseLog().containsKey(customerID)) {
                 isItemSuccessfullyPurchased = false;
-                ClientUtils.log(isItemSuccessfullyPurchased, customerID, itemID, "purchase");
+                ClientUtils.log(isItemSuccessfullyPurchased, customerID, itemID, "purchase", this.provinceID);
                 return isItemSuccessfullyPurchased;
             }
 
-        if (ClientUtils.verifyID(itemID)) {
+        if (ClientUtils.verifyID(itemID, this.provinceID)) {
 
             purchasedItem = ClientUtils.purchaseSingularItem(itemID, store.getInventory());
             isItemSuccessfullyPurchased = purchasedItem == null ? false : true;
@@ -46,7 +46,7 @@ public class ClientHelper {
 
                 System.out.println("MKC1:");
                 if (!ClientUtils.customerHasRequiredFunds(customerID, price, store.getCustomerBudgetLog())) {
-                    ClientUtils.log(!isItemSuccessfullyPurchased, customerID, itemID, "purchase");
+                    ClientUtils.log(!isItemSuccessfullyPurchased, customerID, itemID, "purchase", this.provinceID);
                     return false;
                 }
                 System.out.println("MKC2:");
@@ -66,7 +66,7 @@ public class ClientHelper {
                 itemIDandDateOfPurchase.put(itemID, dateOfPurchaseDateObject);
                 store.getCustomerPurchaseLog().put(customerID, itemIDandDateOfPurchase);
                 store.requestUpdateOfCustomerBudgetLog(customerID, price);
-                ClientUtils.log(isItemSuccessfullyPurchased, customerID, itemID, "purchase");
+                ClientUtils.log(isItemSuccessfullyPurchased, customerID, itemID, "purchase", this.provinceID);
             } else {
                 Scanner scanner = new Scanner(System.in);
                 System.out.println("Do you want to be put on the waitlist for this item, yes or no: ");
@@ -75,21 +75,21 @@ public class ClientHelper {
                     store.waitList(customerID, itemID, dateOfPurchase);
                 }
 
-                ClientUtils.log(isItemSuccessfullyPurchased, customerID, itemID, "purchase");
+                ClientUtils.log(isItemSuccessfullyPurchased, customerID, itemID, "purchase", this.provinceID);
             }
 
         } else {
             System.out.println("Alert: Item does not seem to belong in this store, requesting item from the appropriate store...");
-            isItemSuccessfullyPurchased = ClientUtils.requestItemFromCorrectStore(customerID, itemID, dateOfPurchase);
+            isItemSuccessfullyPurchased = ClientUtils.requestItemFromCorrectStore(customerID, itemID, dateOfPurchase, this.provinceID);
 
             if (isItemSuccessfullyPurchased) {
 
                 HashMap<String, Date> itemIDandDateOfPurchase = new HashMap<>();
                 itemIDandDateOfPurchase.put(itemID, dateOfPurchaseDateObject);
                 store.getCustomerPurchaseLog().put(customerID, itemIDandDateOfPurchase);
-                ClientUtils.log(isItemSuccessfullyPurchased, customerID, itemID, "purchase");
+                ClientUtils.log(isItemSuccessfullyPurchased, customerID, itemID, "purchase", this.provinceID);
             }
-            ClientUtils.log(isItemSuccessfullyPurchased, customerID, itemID, "purchase");
+            ClientUtils.log(isItemSuccessfullyPurchased, customerID, itemID, "purchase", this.provinceID);
         }
 
 
@@ -101,7 +101,7 @@ public class ClientHelper {
         HashMap<String, List<Item>> remotelyFoundItems = new HashMap<>();
 
         locallyFoundItems = getItemsByName(itemName, inventory);
-        remotelyFoundItems = ClientUtils.getRemoteItemsByName(itemName);
+        remotelyFoundItems = ClientUtils.getRemoteItemsByName(itemName, this.provinceID);
         List<Item> allFoundItems = ClientUtils.mergeAllFoundItems(locallyFoundItems, remotelyFoundItems);
 
         String logString = "";
@@ -127,7 +127,7 @@ public class ClientHelper {
 
     public synchronized String returnItem(String customerID, String itemID, String dateOfReturn, StoreImpl store) {
         Date dateOfReturnDateObject =  DateUtils.createDateFromString(dateOfReturn);
-        if (ClientUtils.verifyID(customerID))
+        if (ClientUtils.verifyID(customerID, this.provinceID))
             if (store.getCustomerPurchaseLog().containsKey(customerID))
                 if (store.getCustomerPurchaseLog().get(customerID).containsKey(itemID)) {
                     if (ClientUtils.isItemReturnWorthy((store.getCustomerPurchaseLog().get(customerID).get(itemID)), dateOfReturn, itemID)) {
