@@ -65,6 +65,7 @@ public class StoreImpl extends StorePOA {
     }
     @Override
     public String addItem(String managerID, String itemID, String itemName, int quantity, double price) {
+        //TODO For waitlisted customers, check their budget before giving them the item.
         return getManagerHelper().addItem(managerID, itemID, itemName, quantity, price, this);
     }
 
@@ -80,6 +81,8 @@ public class StoreImpl extends StorePOA {
 
     @Override
     public boolean purchaseItem(String customerID, String itemID, String dateOfPurchase) {
+        //TODO Check the returned logs, if that customer has equal amount of items purchased an returned and they are foreign, they can shop here again
+        //TODO use this logic to determine if they should be purchasing
         return getClientHelper().purchaseItem(customerID, itemID, dateOfPurchase, this);
     }
 
@@ -91,6 +94,23 @@ public class StoreImpl extends StorePOA {
     @Override
     public String returnItem(String customerID, String itemID, String dateOfReturn) {
         return getClientHelper().returnItem(customerID, itemID, dateOfReturn, this);
+    }
+
+    @Override
+    public String exchange(String customerID, String newItemID, String oldItemID) {
+        String dateOfPurchase = new SimpleDateFormat("mm/dd/yyyy HH:mm").format(new Date());
+        String result = returnItem(customerID, oldItemID, dateOfPurchase);
+
+        boolean isReturnSuccessful = false;
+        boolean isPurchaseSuccessful = false;
+
+        String[] s = result.split("\n");
+        isReturnSuccessful = Boolean.parseBoolean(s[2]);
+
+        if(isReturnSuccessful) { isPurchaseSuccessful = purchaseItem(customerID, newItemID, dateOfPurchase); }
+        boolean isExchangeSuccessful = isPurchaseSuccessful && isReturnSuccessful;
+
+        return newItemID+"\n"+oldItemID+"\n"+isExchangeSuccessful;
     }
 
     @Override
@@ -114,7 +134,7 @@ public class StoreImpl extends StorePOA {
     @Override
     public boolean waitList(String customerID, String itemID, String dateOfPurchase) {
         Boolean isWaitListed = false;
-        //if(getCustomerBudgetLog().get(customerID.toLowerCase())  ) //TODO Move logic for deciding to put person on waiutlist here, check their budget AND if they're foreign and bought here before
+        //if(getCustomerBudgetLog().get(customerID.toLowerCase())) //TODO Move logic for deciding to put person on waiutlist here, check their budget AND if they're foreign and bought here before
         if(itemWaitList.containsKey(itemID)) {
             itemWaitList.get(itemID).add(customerID);
 

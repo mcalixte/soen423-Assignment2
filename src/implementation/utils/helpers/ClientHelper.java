@@ -22,6 +22,8 @@ public class ClientHelper {
     }
 
     public synchronized Boolean purchaseItem(String customerID, String itemID, String dateOfPurchase, StoreImpl store) {
+        //TODO User can be added to a waitlist whether they have money or not for an item, but if purchase fails, try to give the item to any other person waiting and so on.
+        //TODO ... If it doesn't succeed do nothing
         Date dateOfPurchaseDateObject =  DateUtils.createDateFromString(dateOfPurchase);
         Boolean isItemSuccessfullyPurchased = false;
         Item purchasedItem;
@@ -33,7 +35,6 @@ public class ClientHelper {
             }
 
         if (ClientUtils.verifyID(itemID, this.provinceID)) {
-
             purchasedItem = ClientUtils.purchaseSingularItem(itemID, store.getInventory());
             isItemSuccessfullyPurchased = purchasedItem == null ? false : true;
             System.out.println("isItemSuccessfullyPurchased: " + isItemSuccessfullyPurchased);
@@ -140,33 +141,37 @@ public class ClientHelper {
                         String itemIDToReturn;
                         itemIDToReturn = store.getInventory().get(itemID) != null &&  store.getInventory().get(itemID).size() > 0 ? itemID : "";
 
-                        return itemIDToReturn;
+                        return itemIDToReturn+"\n"+true;
                     } else {
                         System.out.println("Alert: Customer has purchased this item in the past, but item purchase date exceeds 30days");
                         String logString = ">>" + new SimpleDateFormat("MM/dd/yyyy HH:mm:ssZ").format(new Date()) + " << Task UNSUCCESSFUL: Return Item to Inventory CustomerID: " + customerID + " ItemID: " + itemID;
                         Logger.writeUserLog(customerID, logString);
                         Logger.writeStoreLog(this.provinceID, logString);
-                        return "";
+
+                        String itemIDToReturn;
+                        itemIDToReturn = store.getInventory().get(itemID) != null &&  store.getInventory().get(itemID).size() > 0 ? itemID : "";
+
+                        return itemIDToReturn+" \n"+false;
                     }
                 } else {
                     System.out.println("Alert: Customer has past purchases, but NOT of this item");
                     String logString = ">>" + new SimpleDateFormat("MM/dd/yyyy HH:mm:ssZ").format(new Date()) + " << Task UNSUCCESSFUL: Return Item to Inventory CustomerID: " + customerID + " ItemID: " + itemID;
                     Logger.writeUserLog(customerID, logString);
                     Logger.writeStoreLog(this.provinceID, logString);
-                    return "";
+                    return " \n"+false;
                 }
             else {
                 System.out.println("Alert: Customer has no record of past purchases");
                 String logString = ">>" + new SimpleDateFormat("MM/dd/yyyy HH:mm:ssZ").format(new Date()) + " << Task UNSUCCESSFUL: Return Item to Inventory CustomerID: " + customerID + " ItemID: " + itemID;
                 Logger.writeUserLog(customerID, logString);
                 Logger.writeStoreLog(this.provinceID, logString);
-                return "";
+                return " \n"+false;
             }
         else {
             System.out.println("Alert: Customer should not be attempting returns at this store, try an appropriate store...");
             String logString = ">>" + new SimpleDateFormat("MM/dd/yyyy HH:mm:ssZ").format(new Date()) + " << Task UNSUCCESSFUL: Return Item to Inventory CustomerID: " + customerID + " ItemID: " + itemID;
             Logger.writeUserLog(customerID, logString);
-            return "";
+            return " \n"+false;
         }
     }
 
