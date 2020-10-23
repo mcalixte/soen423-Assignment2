@@ -80,7 +80,7 @@ public class StoreImpl extends StorePOA {
     }
 
     @Override
-    public boolean purchaseItem(String customerID, String itemID, String dateOfPurchase) {
+    public String purchaseItem(String customerID, String itemID, String dateOfPurchase) {
         //TODO Check the returned logs, if that customer has equal amount of items purchased an returned and they are foreign, they can shop here again
         //TODO use this logic to determine if they should be purchasing
         return getClientHelper().purchaseItem(customerID, itemID, dateOfPurchase, this);

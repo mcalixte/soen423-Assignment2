@@ -1,11 +1,12 @@
 package implementation.utils.helpers.managerUtils;
 
+import implementation.StoreImpl;
 import implementation.entities.item.Item;
+import implementation.utils.logger.Logger;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 public class ManagerUtils {
 
@@ -94,5 +95,43 @@ public class ManagerUtils {
             }
         }
         return returnMessage.toString();
+    }
+
+    public static void handleWaitlistedCustomers(String managerID, String itemID, double price, String provinceID, StoreImpl store) {
+        for(Map.Entry<String, List<String>> entry : store.getItemWaitList().entrySet()){
+            System.out.println("MKC3.5---:"+1);
+            if(itemID.equalsIgnoreCase(entry.getKey())) {
+                System.out.println("MKC:4 ---: "+ itemID.equalsIgnoreCase(entry.getKey()));
+                for(int i = 0; i < entry.getValue().size(); i++) {
+                    System.out.println("MKC5: "+ManagerUtils.customerHasRequiredFunds(entry.getValue().get(i), price, store.getCustomerBudgetLog()));
+                    if(ManagerUtils.customerHasRequiredFunds(entry.getValue().get(i), price, store.getCustomerBudgetLog())) {
+                        HashMap<String, Date> map = new HashMap<>();
+                        String dateString = new SimpleDateFormat("mm/dd/yyyy HH:mm").format(new Date());
+                        try {
+                            map.put(itemID, new SimpleDateFormat("mm/dd/yyyy HH:mm").parse(dateString));
+                        } catch (ParseException e) {
+                            System.out.println("Unable to purchase item due to a malformed date string... Restart the process of purchasing");
+                        }
+
+                        try {
+                            store.purchaseItem(entry.getValue().get(i), itemID, dateString);
+                        } catch (Exception e) {
+                            System.out.println("Unable to purchase item due to a malformed date string... Restart the process of purchasing");
+                        }
+                        store.getCustomerPurchaseLog().put(entry.getKey(), map);
+
+                        if(store.getCustomerBudgetLog().containsKey(entry.getKey().toLowerCase()))
+                            store.getCustomerBudgetLog().put(entry.getKey().toLowerCase(), store.getCustomerBudgetLog().get(entry.getKey().toLowerCase()) - price);
+                        else
+                            store.getCustomerBudgetLog().put(entry.getKey().toLowerCase(), 1000.00 - price);
+
+                        String logString = ">>" +new SimpleDateFormat("MM/dd/yyyy HH:mm:ssZ").format(new Date())+" << Task SUCCESSFUL: Purchased Item from inventory Customer: "+ entry.getKey() +"have now received their items ItemID: "+ itemID;
+                        Logger.writeUserLog(managerID, logString);
+                        Logger.writeUserLog(entry.getKey(), logString);
+                        Logger.writeStoreLog(provinceID, logString);
+                    }
+                }
+            }
+        }
     }
 }

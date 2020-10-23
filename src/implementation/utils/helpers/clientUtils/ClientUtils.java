@@ -106,6 +106,13 @@ public class ClientUtils {
     }
 
     public static void returnItemToInventory(String itemID, List<Item> itemLog, HashMap<String, List<Item>> inventory) {
+        if(inventory.containsKey(itemID.toLowerCase()))
+            if(inventory.get(itemID.toLowerCase()) != null)
+                for(Item item : itemLog)
+                    if(itemID.equalsIgnoreCase(item.getItemID()))
+                        inventory.get(itemID).add(item);
+                    //TODO You should have error checking for if this type of item does not exist yet(or anymore) in the inventory
+        //TODO
     }
 
     public static void log(Boolean itemSuccessfullyPurchased, String customerID, String itemID, String actionType, String provinceID) {

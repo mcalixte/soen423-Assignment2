@@ -1,0 +1,124 @@
+NOTE: CHECK THAT YOU HAVE THE CORRECT TYPES DOUBLE NOT INTEGER
+
+Test Case group 1: 
+	1. Add Item BCM1111 - BC1234, LAPTOP, 3, 980 
+	   Add Item BCM1111 - BC1111, TEA, 1, 30 
+	    
+	2. As QCM1111 Add QC1234, TEA, 1, 30  
+	3. As QCM1111 Add QC1111, XYZ, 1, 40 
+	    
+	4. QCM1111 - List Item Availability  
+
+
+Test Case group 2: Find item
+	1. As ONC1111, Item Name - TEA 3. 
+		Result: Successful QC1234 -
+	2. As user ONC1111 Purchase items BC1234 - “LAPTOP” "TEA" 
+		Result: Failed (LIMITED BUDGET)
+
+ 
+Test Case group 3:
+
+	1. Purchase items by ONC1111 QC1234 - “TEA” 
+		Result: Successful QC1234 - “TEA” 
+	2. Purchase items by ONC1111 BC1234 - “LAPTOP” 
+	   	Result: Failed (LIMITED BUDGET)
+		
+	3. Remove Operation on QC1234 by 1
+	   	Result: Quantity decreased by 1 --> Result: Successfully removed 1 tea item QC1234 - “TEA” 
+	4. Remove Operation on QC1234 by -1
+		Result: Item removed fromt he inventory now, no longer exists --> Result: Successfully removed 1 tea item QC1234 - “TEA” from store
+		
+	5. List Item QC1234 - Removed completely from the store inventory
+		Result: Item removed fromt the inventory now, should not be listed
+
+
+
+Test Case group 4:
+
+	1. Purchase Operation by BCC1111 QC1234 - “TEA” 
+		Result: Successful QC1111 - 
+		
+	2. Purchase Operation by BCC1111 on QC1111 “XYZ” 
+		Result: Failed (Cannot purchase more than one item from other store) 
+		
+	3. Purchase Operation by QCC1111 QC1234 - “TEA”
+		Result: Item Not Available. Add into Waitlist
+		
+		3.1 Return Operation by BCU1111 QC1234 - “TEA”, (Current Date) 
+			Result-1: Successful, Item was returned to the store because it had a correct date
+			Result-2: Successful, Item was successfully purchased by QCC1111 of QC1234
+			
+		3.2 Using QCM1111, LIST ITEM AVAILABILITY 
+			Result: QC1234 - 0 (QCC1111 purchased the item from waitlist) 
+		
+		3.3 Purchase Operation by QCC1111 - QC1234 
+			Result: Failed, because there arent any QC1234 left, Ask to be put on the waitlist --> WATCH FOR NULL POINTER EXCEPTIONS WHEN LIST SIZE IS 0 IN 
+
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+Test Case group 5: 
+
+	//Exchange for an item that does not exist --> No waitlist, it just fails
+	//Exchange an item late (was purchased more than 30 days ago)
+	//Exchange an item on time (was purchased less than 30 days ago)
+	//Exchange an item but no budget for the new item
+	//Exchange an item with budget for the new item on time --> gets their money back, then buys newItem and updates budget again (we update the budget twice)
+	//If a customer is on a waitlist for ITEM-A, but buys something else and no longer can afford the item, remove them from the waitlist ad give it to some one else who does (if any)
+	
+
+	1. Add Item BCM1111 - BC1234, LAPTOP, 3, 980 
+	   Add Item BCM1111 - BC1111, TEA, 2, 30 
+	    
+	2. As QCM1111 Add QC1234, TEA, 1, 30  
+	3. As QCM1111 Add QC1111, XYZ, 1, 40 
+	
+	4. Purchase items by ONU1111 QC1234 - “TEA” 
+		Result: Successful QC1234 - “TEA” 
+	5. ONC1111 tries to exchange QC1234 for QC1111
+		Result: Fails, this foreign client has purchased from this store before
+	6. ONC1111 tries to exchange QC1234 for BC1234
+		Result: Fails, Customer does not have the budget to buy
+	7. ONC1111 tries to exchange QC1234 for BC1111
+		Result: Successfull 
+		
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------	
+
+Test Case group 6: Concurrency Test 
+
+	
+
+	1. Add Item BCM1111 - BC1234, LAPTOP, 3, 980 
+	   Add Item BCM1111 - BC1111, TEA, 2, 30 
+	    
+	2. As QCM1111 Add QC1234, TEA, 2, 30 
+	 
+	3. As QCM1111 Add QC1111, XYZ, 2, 40 
+	
+	4. Purchase items by ONC1111 QC1234 - “TEA” 
+		Result: Successful QC1234 - “TEA” 
+		
+	   Purchase items by QCC1111 QC1234 - “TEA” 
+		Result: Successful QC1234 - “TEA” 
+		
+	   Purchase items by BCC1111 QC1234 - “TEA” 
+		Result: Fail, PUT ON WAITLIST for QC1234 - “TEA”
+		
+	5. ONC1111 tries to exchange QC1234 for QC1111
+		Result: Fails, this foreign client has purchased from this store before
+		
+	   QCC1111 tries to exchange QC1234 for QC1111
+		Result-1: Successful, item was exchanged
+		Result-2: Successful, BCC1111 receives their QC1234 - “TEA”
+			
+	6. ONC1111 tries to exchange QC1234 for BC1111
+		Result: Successfull
+	
+
+		
+	    
+

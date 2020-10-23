@@ -7,7 +7,7 @@ module StoreApp {
         string listItemAvailability (in string managerID);
 
         //Client Invokable methods
-        boolean purchaseItem (in string customerID, in string itemID, in string dateOfPurchase);
+        string purchaseItem (in string customerID, in string itemID, in string dateOfPurchase);
         string findItem (in string customerID, in string itemName);
         string returnItem ( in string customerID, in string itemID, in string dateOfReturn);
         string exchange ( in string customerID, in string newItemID, in string oldItemID);

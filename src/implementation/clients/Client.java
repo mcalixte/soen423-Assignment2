@@ -44,9 +44,7 @@ public class Client {
             prepareCommandConsoleInterfaces(completeCommandInterface);
 
             while (true) {
-            System.out.println("\t\t >>>>>>>>>> Welcome to the DSMS <<<<<<<<<<<<< \n\n");
-
-
+                System.out.println("\t\t >>>>>>>>>> Welcome to the DSMS <<<<<<<<<<<<< \n\n");
                 System.out.print("Please Specify what type of user you are. Type 'C' for Customer or 'M' for Manager.\n");
                 System.out.print("User-Type: ");
 

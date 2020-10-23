@@ -21,7 +21,7 @@ public class ClientHelper {
         this.provinceID = provinceID;
     }
 
-    public synchronized Boolean purchaseItem(String customerID, String itemID, String dateOfPurchase, StoreImpl store) {
+    public synchronized String purchaseItem(String customerID, String itemID, String dateOfPurchase, StoreImpl store) {
         //TODO User can be added to a waitlist whether they have money or not for an item, but if purchase fails, try to give the item to any other person waiting and so on.
         //TODO ... If it doesn't succeed do nothing
         Date dateOfPurchaseDateObject =  DateUtils.createDateFromString(dateOfPurchase);
