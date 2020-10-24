@@ -112,6 +112,8 @@ public class Client {
                 + "\trequired parameters:  ( Customer ID  ,  Item Name )\n\n";
         String returnCommandInterface = "\t>>>>>>>>>>> Return <<<<<<<<<<<\n"
                 + "\trequired parameters:  ( Customer ID  ,  Item ID )\n\n";
+        String exchangeCommandInterface = "\t>>>>>>>>>>> Return <<<<<<<<<<<\n"
+                + "\trequired parameters:  ( Customer ID  ,  New Item ID,  Old Item ID )\n\n";
 
         managerCommandInterfaces.put("add", addCommandInterface);
         managerCommandInterfaces.put("remove", removeCommandInterface);
@@ -121,6 +123,7 @@ public class Client {
         customerCommandInterfaces.put("purchase", purchaseCommandInterface);
         customerCommandInterfaces.put("find", findCommandInterface);
         customerCommandInterfaces.put("return", returnCommandInterface);
+        customerCommandInterfaces.put("exchange", exchangeCommandInterface);
         completeCommandInterface.put("C", customerCommandInterfaces);
     }
 
