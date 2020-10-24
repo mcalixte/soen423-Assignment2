@@ -103,11 +103,18 @@ public class StoreImpl extends StorePOA {
 
         boolean isReturnSuccessful = false;
         boolean isPurchaseSuccessful = false;
+        String isPurchaseSuccessfulString = "";
 
         String[] s = result.split("\n");
-        isReturnSuccessful = Boolean.parseBoolean(s[2]);
+        isReturnSuccessful = Boolean.parseBoolean(s[1]);
 
-        if(isReturnSuccessful) { isPurchaseSuccessful = purchaseItem(customerID, newItemID, dateOfPurchase); }
+        if(isReturnSuccessful) {
+            isPurchaseSuccessfulString = purchaseItem(customerID, newItemID, dateOfPurchase);
+            isPurchaseSuccessful = isPurchaseSuccessfulString.contains("Task SUCCESSFUL:");
+            if(!isPurchaseSuccessful)
+                purchaseItem(customerID, oldItemID, dateOfPurchase);
+        }
+
         boolean isExchangeSuccessful = isPurchaseSuccessful && isReturnSuccessful;
 
         return newItemID+"\n"+oldItemID+"\n"+isExchangeSuccessful;

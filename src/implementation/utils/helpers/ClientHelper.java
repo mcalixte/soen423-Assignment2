@@ -26,75 +26,74 @@ public class ClientHelper {
         //TODO ... If it doesn't succeed do nothing
         Date dateOfPurchaseDateObject =  DateUtils.createDateFromString(dateOfPurchase);
         Boolean isItemSuccessfullyPurchased = false;
-        Item purchasedItem;
+        String purchasedItem;
+        String response;
         if (!ClientUtils.verifyID(customerID, this.provinceID))
             if (store.getCustomerPurchaseLog().containsKey(customerID)) {
                 isItemSuccessfullyPurchased = false;
                 ClientUtils.log(isItemSuccessfullyPurchased, customerID, itemID, "purchase", this.provinceID);
-                return isItemSuccessfullyPurchased;
+                return "Task UNSUCCESSFUL: Foreign Customer has purchased from this store once before " + customerID + "," + itemID + "," + dateOfPurchase + "," + "" + isItemSuccessfullyPurchased + "";
             }
 
-        if (ClientUtils.verifyID(itemID, this.provinceID)) {
-            purchasedItem = ClientUtils.purchaseSingularItem(itemID, store.getInventory());
-            isItemSuccessfullyPurchased = purchasedItem == null ? false : true;
-            System.out.println("isItemSuccessfullyPurchased: " + isItemSuccessfullyPurchased);
-            if (isItemSuccessfullyPurchased) {
-                double price = 0.00;
+        double price = 0.00;
+        price = getSpecificItemPrice(itemID, store, price);
 
-                for (Map.Entry<String, List<Item>> entry : store.getInventory().entrySet())
-                    if (entry.getKey().equalsIgnoreCase(itemID))
-                        price = entry.getValue().get(0).getPrice();
+        if(price != -1) {
+            if (!ClientUtils.customerHasRequiredFunds(customerID, price, store.getCustomerBudgetLog())) {
+                ClientUtils.log(!isItemSuccessfullyPurchased, customerID, itemID, "purchase", this.provinceID);
+                response = "Task UNSUCCESSFUL: Customer does not have the funds for this item,"+customerID + "," + itemID + "," + dateOfPurchase + "," + isItemSuccessfullyPurchased;
 
-                System.out.println("MKC1:");
-                if (!ClientUtils.customerHasRequiredFunds(customerID, price, store.getCustomerBudgetLog())) {
-                    ClientUtils.log(!isItemSuccessfullyPurchased, customerID, itemID, "purchase", this.provinceID);
-                    return false;
-                }
-                System.out.println("MKC2:");
-                if ( store.getCustomerBudgetLog().containsKey(customerID.toLowerCase()))
-                    if (ClientUtils.customerHasRequiredFunds(customerID.toLowerCase(), price,  store.getCustomerBudgetLog()))
-                        store.getCustomerBudgetLog().put(customerID.toLowerCase(),  store.getCustomerBudgetLog().get(customerID.toLowerCase()) - price);
-                    else
-                        System.out.println("Alert: Item to expensive for the customers budget...");
-
-                else if (ClientUtils.customerHasRequiredFunds(customerID.toLowerCase(), price,  store.getCustomerBudgetLog())) {
-                    System.out.println("MKC3:");
-                    Double budget = 1000.00 - price;
-                    store.getCustomerBudgetLog().put(customerID.toLowerCase(), budget);
-                }
-
-                HashMap<String, Date> itemIDandDateOfPurchase = new HashMap<>();
-                itemIDandDateOfPurchase.put(itemID, dateOfPurchaseDateObject);
-                store.getCustomerPurchaseLog().put(customerID, itemIDandDateOfPurchase);
-                store.requestUpdateOfCustomerBudgetLog(customerID, price);
-                ClientUtils.log(isItemSuccessfullyPurchased, customerID, itemID, "purchase", this.provinceID);
-            } else {
-                Scanner scanner = new Scanner(System.in);
-                System.out.println("Do you want to be put on the waitlist for this item, yes or no: ");
-                String answer = scanner.nextLine();
-                if (answer.equalsIgnoreCase("yes")) {
-                    store.waitList(customerID, itemID, dateOfPurchase);
-                }
-
-                ClientUtils.log(isItemSuccessfullyPurchased, customerID, itemID, "purchase", this.provinceID);
+                return response;
             }
-
-        } else {
-            System.out.println("Alert: Item does not seem to belong in this store, requesting item from the appropriate store...");
-            isItemSuccessfullyPurchased = ClientUtils.requestItemFromCorrectStore(customerID, itemID, dateOfPurchase, this.provinceID);
-
-            if (isItemSuccessfullyPurchased) {
-
-                HashMap<String, Date> itemIDandDateOfPurchase = new HashMap<>();
-                itemIDandDateOfPurchase.put(itemID, dateOfPurchaseDateObject);
-                store.getCustomerPurchaseLog().put(customerID, itemIDandDateOfPurchase);
-                ClientUtils.log(isItemSuccessfullyPurchased, customerID, itemID, "purchase", this.provinceID);
-            }
-            ClientUtils.log(isItemSuccessfullyPurchased, customerID, itemID, "purchase", this.provinceID);
         }
 
 
-        return isItemSuccessfullyPurchased;
+
+        purchasedItem = ClientUtils.purchaseSingularItem(itemID, store.getInventory());
+        isItemSuccessfullyPurchased = purchasedItem.equalsIgnoreCase("An item of that name does not exist in this store or has been removed") ? false : true;
+
+        if (isItemSuccessfullyPurchased) {
+            if (store.getCustomerBudgetLog().containsKey(customerID.toLowerCase())) {
+                store.getCustomerBudgetLog().put(customerID.toLowerCase(), store.getCustomerBudgetLog().get(customerID.toLowerCase()) - price);
+                updateCustomerPurchaseLog(customerID, itemID, store, dateOfPurchaseDateObject);
+                store.requestUpdateOfCustomerBudgetLog(customerID, price);
+            }
+            else {
+                Double budget = 1000.00 - price;
+                store.getCustomerBudgetLog().put(customerID.toLowerCase(), budget);
+                updateCustomerPurchaseLog(customerID, itemID, store, dateOfPurchaseDateObject);
+                store.requestUpdateOfCustomerBudgetLog(customerID, price);
+            }
+
+            ClientUtils.log(isItemSuccessfullyPurchased, customerID, itemID, "purchase", this.provinceID);
+            response = "Task SUCCESSFUL: Customer purchased Item "+customerID + "," + itemID + "," + dateOfPurchase + "," + isItemSuccessfullyPurchased;
+            return response;
+        } else {
+            if(itemID.contains(this.provinceID.toLowerCase())) {
+                store.waitList(customerID, itemID, dateOfPurchase);
+                ClientUtils.log(isItemSuccessfullyPurchased, customerID, itemID, "purchase", this.provinceID);
+                response = "Task UNSUCCESSFUL: However customer added to the waitlist for this item. "+customerID + "," + itemID + "," + dateOfPurchase + "," + isItemSuccessfullyPurchased;
+                return response;
+            }
+            else{
+                response = ClientUtils.requestItemFromCorrectStore(customerID, itemID, dateOfPurchase, this.provinceID);
+                return response;
+            }
+        }
+    }
+
+    private void updateCustomerPurchaseLog(String customerID, String itemID, StoreImpl store, Date dateOfPurchaseDateObject) {
+        HashMap<String, Date> itemIDandDateOfPurchase = new HashMap<>();
+        itemIDandDateOfPurchase.put(itemID, dateOfPurchaseDateObject);
+        store.getCustomerPurchaseLog().put(customerID, itemIDandDateOfPurchase);
+    }
+
+    private double getSpecificItemPrice(String itemID, StoreImpl store, double price) {
+        for (Item item : store.getItemLog())
+            if (item.getItemID().equalsIgnoreCase(itemID))
+                price = item.getPrice();
+
+        return price;
     }
 
     public String findItem(String customerID, String itemName, HashMap<String, List<Item>> inventory) {
@@ -105,30 +104,30 @@ public class ClientHelper {
         remotelyFoundItems = ClientUtils.getRemoteItemsByName(itemName, this.provinceID);
         List<Item> allFoundItems = ClientUtils.mergeAllFoundItems(locallyFoundItems, remotelyFoundItems);
 
-        String logString = "";
-        System.out.println(">>>>>>>>>>>> All Items Found <<<<<<<<<<<< \n");
+        StringBuilder logString = new StringBuilder();
+        logString.append(">>>>>>>>>>>> All Items Found <<<<<<<<<<<< \n");
         StringBuilder foundItems = new StringBuilder();
         for (Item item : allFoundItems)
             foundItems.append("\t" + item.toString() + "\n");
 
         if (allFoundItems != null)
             if (allFoundItems.size() == 0)
-                logString = ">>" + new SimpleDateFormat("MM/dd/yyyy HH:mm:ssZ").format(new Date()) + " << Task SUCCESSFUL: Find Item from local and remote Inventory CustomerID: " + customerID + " Item name: " + itemName + ". HOWEVER, No items found.";
+                logString.append(">>" + new SimpleDateFormat("MM/dd/yyyy HH:mm:ssZ").format(new Date()) + " << Task SUCCESSFUL: Find Item from local and remote Inventory CustomerID: " + customerID + " Item name: " + itemName + ". HOWEVER, No items found.");
 
             else
-                logString = ">>" + new SimpleDateFormat("MM/dd/yyyy HH:mm:ssZ").format(new Date()) + " << Task SUCCESSFUL: Find Item from local and remote Inventory CustomerID: " + customerID + " Item name: " + itemName + "." + allFoundItems.size() + " item(s) found.";
+                logString.append(">>" + new SimpleDateFormat("MM/dd/yyyy HH:mm:ssZ").format(new Date()) + " << Task SUCCESSFUL: Find Item from local and remote Inventory CustomerID: " + customerID + " Item name: " + itemName + "." + allFoundItems.size() + " item(s) found.");
         else
-            logString = ">>" + new SimpleDateFormat("MM/dd/yyyy HH:mm:ssZ").format(new Date()) + " << Task UNSUCCESSFUL: Find Item from local and remote Inventory CustomerID: " + customerID + " Item name: " + itemName + ". No items found.";
+            logString.append(">>" + new SimpleDateFormat("MM/dd/yyyy HH:mm:ssZ").format(new Date()) + " << Task UNSUCCESSFUL: Find Item from local and remote Inventory CustomerID: " + customerID + " Item name: " + itemName + ". No items found.");
 
-        Logger.writeStoreLog(this.provinceID, logString);
-        Logger.writeUserLog(customerID, logString);
+        Logger.writeStoreLog(this.provinceID, logString.toString());
+        Logger.writeUserLog(customerID, logString.toString());
 
         return foundItems.toString();
     }
 
     public synchronized String returnItem(String customerID, String itemID, String dateOfReturn, StoreImpl store) {
         Date dateOfReturnDateObject =  DateUtils.createDateFromString(dateOfReturn);
-        if (ClientUtils.verifyID(customerID, this.provinceID))
+        if (ClientUtils.verifyID(itemID, this.provinceID))
             if (store.getCustomerPurchaseLog().containsKey(customerID))
                 if (store.getCustomerPurchaseLog().get(customerID).containsKey(itemID)) {
                     if (ClientUtils.isItemReturnWorthy((store.getCustomerPurchaseLog().get(customerID).get(itemID)), dateOfReturn, itemID)) {
@@ -151,31 +150,39 @@ public class ClientHelper {
                         String itemIDToReturn;
                         itemIDToReturn = store.getInventory().get(itemID) != null &&  store.getInventory().get(itemID).size() > 0 ? itemID : "";
 
-                        return itemIDToReturn+" \n"+false;
+                        return itemIDToReturn+"\n"+false;
                     }
                 } else {
                     System.out.println("Alert: Customer has past purchases, but NOT of this item");
                     String logString = ">>" + new SimpleDateFormat("MM/dd/yyyy HH:mm:ssZ").format(new Date()) + " << Task UNSUCCESSFUL: Return Item to Inventory CustomerID: " + customerID + " ItemID: " + itemID;
                     Logger.writeUserLog(customerID, logString);
                     Logger.writeStoreLog(this.provinceID, logString);
-                    return " \n"+false;
+                    return itemID+"\n"+false;
                 }
             else {
                 System.out.println("Alert: Customer has no record of past purchases");
                 String logString = ">>" + new SimpleDateFormat("MM/dd/yyyy HH:mm:ssZ").format(new Date()) + " << Task UNSUCCESSFUL: Return Item to Inventory CustomerID: " + customerID + " ItemID: " + itemID;
                 Logger.writeUserLog(customerID, logString);
                 Logger.writeStoreLog(this.provinceID, logString);
-                return " \n"+false;
+                return itemID+"\n"+false;
             }
         else {
-            System.out.println("Alert: Customer should not be attempting returns at this store, try an appropriate store...");
+            System.out.println("Alert: Item does not belong to this store...");
             String logString = ">>" + new SimpleDateFormat("MM/dd/yyyy HH:mm:ssZ").format(new Date()) + " << Task UNSUCCESSFUL: Return Item to Inventory CustomerID: " + customerID + " ItemID: " + itemID;
             Logger.writeUserLog(customerID, logString);
-            return " \n"+false;
+            return "Alert: Item does not belong to this store..."+"\n"+false;
         }
     }
 
-    public List<Item> getItemsByName(String itemName, HashMap<String, List<Item>> inventory) { return new ArrayList<>(); }
+    public List<Item> getItemsByName(String itemName, HashMap<String, List<Item>> inventory) { List<Item> itemsWithSameName = new ArrayList<>();
+        for(Map.Entry<String, List<Item>> entry : inventory.entrySet()){
+            for(Item item : entry.getValue()){
+                if(item.getItemName().equalsIgnoreCase(itemName))
+                    itemsWithSameName.add(item);
+            }
+        }
+        return itemsWithSameName;
+    }
 
 
     ////////////////////////////////////

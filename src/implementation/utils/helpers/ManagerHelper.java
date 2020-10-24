@@ -19,24 +19,26 @@ public class ManagerHelper {
 
     public synchronized String addItem(String managerID, String itemID, String itemName, int quantity, double price, StoreImpl store) {
         Item item = null;
+        String addToStockResponse = "";
         if(ManagerUtils.verifyID(managerID, this.provinceID)){
             for(int i = 0; i < quantity; i++){
                 item = new Item(itemID, itemName, price);
-                ManagerUtils.addToStock(item, store.getInventory());
+                addToStockResponse = ManagerUtils.addToStock(item, store.getInventory());
+                store.getItemLog().add(item);
             }
 
-            ManagerUtils.handleWaitlistedCustomers(managerID, itemID, price, this.provinceID, store);
+            String waitListRespoonse = ManagerUtils.handleWaitlistedCustomers(managerID, itemID, price, this.provinceID, store);
 
             String logString = ">>" +new SimpleDateFormat("MM/dd/yyyy HH:mm:ssZ").format(new Date())+" << Task SUCCESSFUL: Add Item to Inventory ManagerID: "+managerID+" ItemID: "+itemID+" ItemName: "+itemName+" Quantity: "+quantity+" Price: "+price;
             Logger.writeUserLog(managerID, logString);
             Logger.writeStoreLog(this.provinceID, logString);
-            return item.toString();
+            return addToStockResponse+"\n"+item.toString()+"\n"+waitListRespoonse;
         }
         else {
             String logString = ">>" +new SimpleDateFormat("MM/dd/yyyy HH:mm:ssZ").format(new Date())+" << Task UNSUCCESSFUL: Add Item to Inventory ManagerID: "+managerID+" ItemID: "+itemID+" ItemName: "+itemName+" Quantity: "+quantity+" Price: "+price+ "ALERT: You are not permitted to do this action on this store";
             Logger.writeUserLog(managerID, logString);
             Logger.writeStoreLog(this.provinceID, logString);
-            return "ItemID: null, Item Name: null, Price: null";
+            return "This is a foreign manager, try a proper manager ...";
         }
     }
 
@@ -44,34 +46,33 @@ public class ManagerHelper {
 
 
     public synchronized String removeItem(String managerID, String itemID, int quantity, HashMap<String, List<Item>> inventory) {
-        Item item = null;
+        String item = "";
         if(ManagerUtils.verifyID(managerID, this.provinceID))
             if(quantity != -1)
                 if(!(quantity > ManagerUtils.getItemQuantity(itemID, inventory))){
-                    for(int i = 0; i<quantity; i++)
+                    for(int i = 0; i < quantity ; i++)
                         item = ManagerUtils.removeSingularItem(itemID, inventory);
 
                     String logString = ">>" +new SimpleDateFormat("MM/dd/yyyy HH:mm:ssZ").format(new Date())+" << Task SUCCESSFUL: Remove Item from Inventory ManagerID: "+managerID+" ItemID: "+itemID + " Quantity: "+quantity;
                     Logger.writeUserLog(managerID, logString);
                     Logger.writeStoreLog(this.provinceID, logString);
-                    return item.toString();
+                    return item;
                 }
                 else {
                     String logString = ">>" +new SimpleDateFormat("MM/dd/yyyy HH:mm:ssZ").format(new Date())+" << Task UNSUCCESSFUL: Remove Item from Inventory ManagerID: "+managerID+" ItemID: "+itemID + " Quantity: "+quantity;
-                    System.out.println("Alert: Can not remove items greater then its availability");
+                    System.out.println("\nAlert: Can not remove items greater then its availability\n");
                     Logger.writeStoreLog(this.provinceID, logString);
 
-                    return item.toString();
+                    return "Task UNSUCCESSFUL: Remove Item from Inventory ManagerID: "+managerID+" ItemID: "+itemID + " Quantity: "+quantity+"\nAlert: Can not remove items greater then its availability\n";
                 }
 
             else {
                 ManagerUtils.removeItemTypeFromInventory(itemID, inventory);
                 String logString = ">>" +new SimpleDateFormat("MM/dd/yyyy HH:mm:ssZ").format(new Date())+" << Task SUCCESSFUL: Completely Remove Item from Inventory ManagerID: "+managerID+" ItemID: "+itemID + " Quantity: "+quantity;
-                System.out.println("\nALERT: You are not permitted to do this action on this store\n");
                 Logger.writeUserLog(managerID, logString);
                 Logger.writeStoreLog(this.provinceID, logString);
 
-                return item.toString();
+                return "Successful: Completely Remove Item from Inventory ManagerID: "+managerID+" ItemID: "+itemID + " Quantity: "+quantity;
 
             }
 
@@ -81,7 +82,7 @@ public class ManagerHelper {
             Logger.writeUserLog(managerID, logString);
             Logger.writeStoreLog(this.provinceID, logString);
 
-            return item.toString();
+            return "Task UNSUCCESSFUL: Remove Item from Inventory ManagerID: "+managerID+" ItemID: "+itemID + " Quantity: "+quantity+"\nALERT: You are not permitted to do this action on this store\n";
         }
     }
 

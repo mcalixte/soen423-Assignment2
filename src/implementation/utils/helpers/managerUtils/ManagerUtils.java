@@ -38,7 +38,8 @@ public class ManagerUtils {
         return customerHasFunds;
     }
 
-    public static void addToStock(Item item, HashMap<String, List<Item>> inventory)  {
+    public static String addToStock(Item item, HashMap<String, List<Item>> inventory)  {
+        String response = "";
         String formattedItemID = item.getItemID().toLowerCase();
         List<Item> itemsInInventoryList = inventory.get(formattedItemID);
         if(itemsInInventoryList != null)
@@ -46,36 +47,39 @@ public class ManagerUtils {
                 if(itemsInInventoryList.get(0).getPrice() == item.getPrice())
                     inventory.get(item.getItemID().toLowerCase()).add(item);
                 else
-                    System.out.println("Alert: Item will not be added, this item does not have the same price as others of its kind... ");
+                    response = "Alert: Item will not be added, this item does not have the same price as others of its kind... ";
             else{
-                System.out.println("Alert: Item will be added, this item is the first of its kind... ");
+                response = "Alert: Item will be added, this item is the first of its kind... ";
                 itemsInInventoryList.add(item);
                 inventory.put(item.getItemID().toLowerCase(), itemsInInventoryList);
             }
         else{
-            System.out.println("Alert: Item will be added for the first time... ");
+            response = "Alert: Item will be added for the first time... ";
             List<Item> itemList = new ArrayList<>();
             itemList.add(item);
             inventory.put(item.getItemID().toLowerCase(), itemList);
         }
+        return response;
     }
 
-    public static Item removeSingularItem(String itemID, HashMap<String, List<Item>> inventory) {
+    public static String removeSingularItem(String itemID, HashMap<String, List<Item>> inventory) {
         String formattedItemID = itemID.toLowerCase();
         List<Item> items = inventory.get(formattedItemID);
-        Item itemToBePurchased = null;
-        if(items != null) {
-            for(int i = 0; i<1 ; i++){
-                itemToBePurchased = items.get(i);
-                items.remove(i);
-                System.out.println(items.get(i).toString());
-            }
+        String itemToBeRemoved = "";
 
-            return itemToBePurchased;
-        }
+        if (items != null )
+            if(items.size() > 0) {
+                itemToBeRemoved = items.get(0).toString();
+                items.remove(0);
+                return itemToBeRemoved;
+            }
+            else {
+                System.out.println("\nThere are no more items of that type left with the itemID: "+itemID+ "\n");
+                return "\nThere are no moore items of that type left with the itemID: "+itemID+ "\n";
+            }
         else {
-            System.out.println("\nAn item of that name does not exist in this store or has been removed\n");
-            return itemToBePurchased;
+            System.out.println("\nAn item of that name does not exist in this store or has been removed completely\n");
+            return itemToBeRemoved;
         }
     }
 
@@ -97,13 +101,11 @@ public class ManagerUtils {
         return returnMessage.toString();
     }
 
-    public static void handleWaitlistedCustomers(String managerID, String itemID, double price, String provinceID, StoreImpl store) {
+    public static String handleWaitlistedCustomers(String managerID, String itemID, double price, String provinceID, StoreImpl store) {
+        String waitlistResponse = "";
         for(Map.Entry<String, List<String>> entry : store.getItemWaitList().entrySet()){
-            System.out.println("MKC3.5---:"+1);
             if(itemID.equalsIgnoreCase(entry.getKey())) {
-                System.out.println("MKC:4 ---: "+ itemID.equalsIgnoreCase(entry.getKey()));
-                for(int i = 0; i < entry.getValue().size(); i++) {
-                    System.out.println("MKC5: "+ManagerUtils.customerHasRequiredFunds(entry.getValue().get(i), price, store.getCustomerBudgetLog()));
+                for(int i = 0; i < entry.getValue().size() - 1; i++) {
                     if(ManagerUtils.customerHasRequiredFunds(entry.getValue().get(i), price, store.getCustomerBudgetLog())) {
                         HashMap<String, Date> map = new HashMap<>();
                         String dateString = new SimpleDateFormat("mm/dd/yyyy HH:mm").format(new Date());
@@ -112,26 +114,22 @@ public class ManagerUtils {
                         } catch (ParseException e) {
                             System.out.println("Unable to purchase item due to a malformed date string... Restart the process of purchasing");
                         }
-
-                        try {
-                            store.purchaseItem(entry.getValue().get(i), itemID, dateString);
-                        } catch (Exception e) {
-                            System.out.println("Unable to purchase item due to a malformed date string... Restart the process of purchasing");
-                        }
+                        waitlistResponse = "Purchased Item from inventory Customer who was on waitlist: CustomerID:"+entry.getValue().get(i)+" itemID:"+itemID;
+                        store.purchaseItem(entry.getValue().get(i), itemID, dateString);
+                        store.removeItem(managerID, itemID, 1);
                         store.getCustomerPurchaseLog().put(entry.getKey(), map);
-
-                        if(store.getCustomerBudgetLog().containsKey(entry.getKey().toLowerCase()))
-                            store.getCustomerBudgetLog().put(entry.getKey().toLowerCase(), store.getCustomerBudgetLog().get(entry.getKey().toLowerCase()) - price);
-                        else
-                            store.getCustomerBudgetLog().put(entry.getKey().toLowerCase(), 1000.00 - price);
+                        entry.getValue().remove(i); //Remove that User from the waitlist
 
                         String logString = ">>" +new SimpleDateFormat("MM/dd/yyyy HH:mm:ssZ").format(new Date())+" << Task SUCCESSFUL: Purchased Item from inventory Customer: "+ entry.getKey() +"have now received their items ItemID: "+ itemID;
                         Logger.writeUserLog(managerID, logString);
                         Logger.writeUserLog(entry.getKey(), logString);
                         Logger.writeStoreLog(provinceID, logString);
+                        return waitlistResponse;
                     }
                 }
             }
         }
+
+        return "";
     }
 }

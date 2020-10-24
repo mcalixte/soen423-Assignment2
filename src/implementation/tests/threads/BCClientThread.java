@@ -16,7 +16,7 @@ public class BCClientThread extends Thread  {
     @Override
     public void run() {
         pause(2000);
-        britishColumbiaStore.purchaseItem("ONC1111", "QC1234", "10/25/2020");
+        britishColumbiaStore.purchaseItem("ONC1111", "QC1234", "10/25/2020 20:00");
     }
 
 

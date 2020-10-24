@@ -11,9 +11,9 @@ public class Logger {
     private static FileWriter fileWriter;
 
     private static String currentProvinceCode = "";
-    private static String managerBaseRelativeFilePath = "./src/entities/managers/logs/";
+    private static String managerBaseRelativeFilePath = "./src/implementation/entities/managers/logs/";
     private static String customerBaseRelativeFilePath = "./src/entities/clients/logs/";
-    private static String storeRelativeFilePath = "./src/entities/storeservers"+currentProvinceCode.toLowerCase()+"/logs/";
+    private static String storeRelativeFilePath = "./src/servers"+currentProvinceCode.toLowerCase()+"/logs/";
 
     private static final String QC = "QC";
     private static final String BC = "BC";

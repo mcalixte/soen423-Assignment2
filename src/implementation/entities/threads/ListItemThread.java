@@ -32,7 +32,7 @@ public class ListItemThread extends Thread {
                 System.out.println("RECEIVED: Item name: " + itemName);
 
                 //Get list from store
-                List<Item> itemsFound = store.getClientHelper().getItemsByName(itemName, store.getInventory()); //TODO Does a list of serializable objects work
+                List<Item> itemsFound = store.getClientHelper().getItemsByName(itemName, store.getInventory());
 
                 ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
                 ObjectOutputStream os = new ObjectOutputStream(outputStream);

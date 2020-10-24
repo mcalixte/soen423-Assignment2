@@ -10,11 +10,15 @@ Test Case group 1:
 	4. QCM1111 - List Item Availability  
 
 
-Test Case group 2: Find item
-	1. As ONC1111, Item Name - TEA 3. 
-		Result: Successful QC1234 -
-	2. As user ONC1111 Purchase items BC1234 - “LAPTOP” "TEA" 
-		Result: Failed (LIMITED BUDGET)
+Test Case group 2: 
+	1. As ONC1111, Find item Item Name - TEA  
+		Result: Successful BC1111, QC1234 TEA ITEMS
+		
+	2. As user ONC1111 Purchase 
+		2.1 Purchase items BC1111 - "TEA"
+			Result: SUCCESS	
+		2.2 Purchase items BC1234 - "LAPTOP"
+			Result: Failed (LIMITED BUDGET)
 
  
 Test Case group 3:

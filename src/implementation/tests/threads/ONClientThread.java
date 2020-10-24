@@ -15,7 +15,7 @@ public class ONClientThread extends Thread  {
 
     @Override
     public void run() {
-        quebecStore.purchaseItem("ONC1111", "QC1234", "10/25/2020");
+        quebecStore.purchaseItem("ONC1111", "QC1234", "10/25/2020 20:00");
         pause(1000);
         quebecStore.exchange("ONC1111", "QC1111", "QC1234");
         pause(1000);

@@ -40,7 +40,7 @@ public class PurchaseItemThread extends Thread {
             String itemID = purchaseOrder[1];
             String dateOfPurchase = purchaseOrder[2];
 
-            Boolean purchaseOrderSuccess;
+            String purchaseOrderSuccess;
 
             try {
                 InetAddress ip = InetAddress.getLocalHost();
@@ -55,6 +55,7 @@ public class PurchaseItemThread extends Thread {
                 System.out.println("Item sent to the store that made the request ...");
             } catch (Exception e) {
                 System.out.println("PurchaseItem Exception: " + e);
+                e.printStackTrace();
             }
 
 

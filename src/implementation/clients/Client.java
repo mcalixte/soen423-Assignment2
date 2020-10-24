@@ -18,6 +18,9 @@ public class Client {
     private static String provinceID;
     private static double budget = 1000.00;
 
+    private static Store quebecStore;
+    private static Store britishColumbiaStore;
+    private static Store ontarioStore;
 
     ////////////////////////////////////
     ///    User Related Fields       ///
@@ -25,6 +28,7 @@ public class Client {
     private static String quebecProvincePrefix = "QC";
     private static String ontarioProvincePrefix = "ON";
     private static String britishColumbiaProvincePrefix = "BC";
+    private static String userID;
 
     /**
      * @param args the command line arguments
@@ -35,9 +39,9 @@ public class Client {
             org.omg.CORBA.Object objRef = orb.resolve_initial_references("NameService");
             NamingContextExt ncRef = NamingContextExtHelper.narrow(objRef);
 
-            Store quebecStore = StoreHelper.narrow(ncRef.resolve_str("quebecStore"));
-            Store britishColumbiaStore = StoreHelper.narrow(ncRef.resolve_str("britishColumbiaStore"));
-            Store ontarioStore = StoreHelper.narrow(ncRef.resolve_str("ontarioStore"));
+            quebecStore = StoreHelper.narrow(ncRef.resolve_str("quebecStore"));
+            britishColumbiaStore = StoreHelper.narrow(ncRef.resolve_str("britishColumbiaStore"));
+            ontarioStore = StoreHelper.narrow(ncRef.resolve_str("ontarioStore"));
 
             Scanner scanner = new Scanner(System.in);
 
@@ -67,6 +71,7 @@ public class Client {
             }
         } catch (Exception e) {
             System.out.println("Hello Client exception: " + e);
+            e.printStackTrace();
         }
     }
 
@@ -148,44 +153,50 @@ public class Client {
         System.out.println("Alert: Be sure to enter the parameters in order \n");
         String customerID = "";
         String itemID = "";
+        String newItemID = "";
+        String oldItemID = "";
         String itemName = "";
         String dateString;
-        Date date = null;
         switch (command.toLowerCase()) {
             case "purchase":
-                System.out.println("Enter the required Customer ID : ");
-                customerID = scanner.nextLine();
+                System.out.println("The current Customer ID : "+userID);
                 System.out.println("Enter the required item ID : ");
                 itemID = scanner.nextLine();
-                System.out.println("Enter the required date string, format \'dd/mm/yyyy\' : ");
+                System.out.println("Enter the required date string, format \'dd/mm/yyyy HH:mm\' : ");
                 dateString = scanner.nextLine();
                 while (!isDateFormatValid(dateString)) {
                     System.out.println("Date string invalid, try again...");
-                    System.out.println("Enter the required date string, format \'dd/mm/yyyy\' : ");
+                    System.out.println("Enter the required date string, format \'dd/mm/yyyy HH:mm\' : ");
                     dateString = scanner.nextLine();
                 }
-                purchaseItem(store, customerID, itemID, dateString);
+                System.out.println("\t\t >>>>>>> Purchase Item result <<<<<<< \n"+ purchaseItem(store, userID, itemID, dateString));
                 break;
             case "find":
-                System.out.println("Enter the required Customer ID : ");
-                customerID = scanner.nextLine();
+                System.out.println("The current Customer ID : "+userID);
                 System.out.println("Enter the required item name : ");
                 itemName = scanner.nextLine();
-                findItem(store, customerID, itemName);
+                System.out.println("\t\t >>>>>>> Find Item result <<<<<<< \n"+ findItem(store, userID, itemName));
                 break;
             case "return":
-                System.out.println("Enter the required Customer ID : ");
-                customerID = scanner.nextLine();
+                System.out.println("The current Customer ID : "+userID);
                 System.out.println("Enter the required item ID : ");
                 itemID = scanner.nextLine();
-                System.out.println("Enter the required date string, format \'dd/mm/yyyy\' : ");
+                System.out.println("Enter the required date string, format \'dd/mm/yyyy HH:mm\' : ");
                 dateString = scanner.nextLine();
                 while (!isDateFormatValid(dateString)) {
                     System.out.println("Date string invalid, try again...");
-                    System.out.println("Enter the required date string, format \'dd/mm/yyyy\' : ");
+                    System.out.println("Enter the required date string, format \'dd/mm/yyyy HH:mm\' : ");
                     dateString = scanner.nextLine();
                 }
-                returnItem(store, customerID, itemID, dateString);
+                System.out.println("\t\t >>>>>>> Return Item result <<<<<<< \n"+ returnItem(store, userID, itemID, dateString));
+                break;
+            case "exchange":
+                System.out.println("The current Customer ID : "+userID);
+                System.out.println("Enter the required NEW item ID : ");
+                newItemID = scanner.nextLine();
+                System.out.println("Enter the required OLD item ID : ");
+                oldItemID = scanner.nextLine();
+                System.out.println("\t\t >>>>>>> Exchange Item result <<<<<<< \n"+ exchangeItem(store, userID, newItemID, oldItemID));
                 break;
         }
 
@@ -205,8 +216,7 @@ public class Client {
         double price = 0.00;
         switch (command.toLowerCase()) {
             case "add":
-                System.out.println("Enter the required managerID : ");
-                managerID = scanner.nextLine();
+                System.out.println("The current Manager ID : "+userID);
                 System.out.println("Enter the required itemID : ");
                 itemID = scanner.nextLine();
                 System.out.println("Enter the required itemName : ");
@@ -215,21 +225,20 @@ public class Client {
                 quantity = scanner.nextInt();
                 System.out.println("Enter the required price : ");
                 price = scanner.nextDouble();
-                addItem(store, managerID, itemID, itemName, quantity, price);
+                System.out.println("\t\t >>>>>>> ADD Item result <<<<<<< \n"+ addItem(store, userID, itemID, itemName, quantity, price));
+
                 break;
             case "remove":
-                System.out.println("Enter the required managerID : ");
-                managerID = scanner.nextLine();
+                System.out.println("The current Manager ID : "+userID);
                 System.out.println("Enter the required itemID : ");
                 itemID = scanner.nextLine();
                 System.out.println("Enter the required quantity : ");
                 quantity = scanner.nextInt();
-                removeItem(store, managerID, itemID, quantity);
+                System.out.println("\t\t >>>>>>> REMOVE Item result <<<<<<< \n"+ removeItem(store, userID, itemID, quantity));
                 break;
             case "list":
-                System.out.println("Enter the required managerID : ");
-                managerID = scanner.nextLine();
-                listItemAvailability(store, managerID);
+                System.out.println("The current Manager ID : "+userID);
+                System.out.println("\t\t >>>>>>> List item result <<<<<<< \n"+listItemAvailability(store, userID));
                 break;
         }
 
@@ -260,9 +269,9 @@ public class Client {
 
 
     private static void handleUserIDCreation(Scanner scanner) {
-        System.out.print("Time to create a user ID. ID structure  : [Province Prefix][M or C][4 digit number] \n\n");
+        System.out.print("Time to create a user ID. The ID structure is : [Province Prefix][M or C][4 digit number] \n\n");
         System.out.print("Enter your user ID: ");
-        String userID = scanner.nextLine();
+        userID = scanner.nextLine();
 
         while (!isUserIDValid(userID)) {
             System.out.print("Enter your user ID: ");
@@ -270,7 +279,7 @@ public class Client {
         }
     }
 
-    private static boolean isUserIDValid(String userID) {
+    private static boolean isUserIDValid(String userID)  {
         String provinceID = userID.substring(0, 2);
         String userType = userID.substring(2, 3);
         String userNumber = userID.substring(3, userID.length() - 1);
@@ -281,7 +290,7 @@ public class Client {
     private static void handleUserTypeInput(Scanner scanner) {
         userType = scanner.nextLine();
 
-        boolean invalidEntry = true;
+        boolean validEntry = false;
 
         if (validateUserType(userType) && userType.equalsIgnoreCase("C")) {
             System.out.print("A Customer can execute the following actions in their own store: \n\n");
@@ -300,11 +309,11 @@ public class Client {
                     }
 
         } else {
-            System.out.println("Alert: Invalid user type entry. Please try again ...");
-            while (invalidEntry) {
+            while (!validEntry) {
+                System.out.println("\nAlert: Invalid user type entry. Please try again ...");
                 System.out.print("User-Type: ");
                 userType = scanner.nextLine();
-                invalidEntry = validateUserType(userType);
+                validEntry = validateUserType(userType);
             }
         }
 
@@ -318,27 +327,48 @@ public class Client {
     ///     CORBA remote Methods     ///
     ////////////////////////////////////
 
-    public static void addItem(Store store, String managerID, String itemID, String itemName, int quantity, double price) {
-        store.addItem(managerID, itemID, itemName, quantity, price);
+    public static String addItem(Store store, String managerID, String itemID, String itemName, int quantity, double price) {
+        return store.addItem(managerID, itemID, itemName, quantity, price);
     }
 
-    public static void removeItem(Store store, String managerID, String itemID, int quantity) {
-        store.removeItem(managerID, itemID, quantity);
+    public static String removeItem(Store store, String managerID, String itemID, int quantity) {
+        return store.removeItem(managerID, itemID, quantity);
     }
 
-    public static void listItemAvailability(Store store, String managerID) {
-        store.listItemAvailability(managerID);
+    public static String listItemAvailability(Store store, String managerID) {
+        return store.listItemAvailability(managerID);
     }
 
-    public static void purchaseItem(Store store, String customerID, String itemID, String dateOfPurchase) {
-        store.purchaseItem(customerID, itemID, dateOfPurchase);
+    public static String purchaseItem(Store store, String customerID, String itemID, String dateOfPurchase) {
+        return store.purchaseItem(customerID, itemID, dateOfPurchase);
     }
 
-    public static void findItem(Store store, String customerID, String itemID) {
-        store.findItem(customerID, itemID);
+    public static String findItem(Store store, String customerID, String itemID) {
+        return store.findItem(customerID, itemID);
     }
 
-    public static void returnItem(Store store, String customerID, String itemID, String dateOfReturn) {
-        store.returnItem(customerID, itemID, dateOfReturn);
+    public static String returnItem(Store store, String customerID, String itemID, String dateOfReturn) {
+        String returnResponse = "";
+        returnResponse = store.returnItem(customerID, itemID, dateOfReturn);
+
+        String provinceOfItem = itemID.substring(0, 2);
+        if(returnResponse.contains("Alert: Item does not belong to this store...")) {
+            switch (provinceOfItem.toLowerCase()) {
+                case "qc":
+                    returnResponse = quebecStore.returnItem(customerID, itemID, dateOfReturn);
+                    break;
+                case "on":
+                    returnResponse = ontarioStore.returnItem(customerID, itemID, dateOfReturn);
+                    break;
+                case "bc":
+                    returnResponse = britishColumbiaStore.returnItem(customerID, itemID, dateOfReturn);
+                    break;
+            }
+        }
+        return returnResponse;
+    }
+
+    public static String exchangeItem(Store store, String customerID, String newItemID, String oldItemID) {
+        return store.exchange(customerID, newItemID, oldItemID);
     }
 }

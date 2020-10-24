@@ -16,7 +16,7 @@ public class QCClientThread extends Thread  {
     @Override
     public void run() {
         pause(1000);
-        quebecStore.purchaseItem("QCC1111", "QC1234", "10/25/2020");
+        quebecStore.purchaseItem("QCC1111", "QC1234", "10/25/2020 20:00");
         pause(2000);
         quebecStore.exchange("QCC1111", "QC1111", "QC1234");
     }
