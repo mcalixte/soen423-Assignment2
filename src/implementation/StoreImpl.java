@@ -121,19 +121,19 @@ public class StoreImpl extends StorePOA {
     }
 
     @Override
-    public void requestUpdateOfCustomerBudgetLog(String customerID, double price) { //TODO CHange the name OF THIS METHOD
+    public void requestUpdateOfCustomerBudgetLog(String customerID, double budget) { //TODO CHange the name OF THIS METHOD
         switch (this.provinceID.toLowerCase()) {
             case "qc":
-                getClientHelper().sendCustomerBudgetUpdate(ontarioCustomerBudgetPort, customerID, price, this);
-                getClientHelper().sendCustomerBudgetUpdate(britishColumbiaCustomerBudgetPort, customerID, price, this);
+                getClientHelper().sendCustomerBudgetUpdate(ontarioCustomerBudgetPort, customerID, budget, this);
+                getClientHelper().sendCustomerBudgetUpdate(britishColumbiaCustomerBudgetPort, customerID, budget, this);
                 break;
             case "on":
-                getClientHelper().sendCustomerBudgetUpdate(quebecCustomerBudgetPort, customerID, price, this);
-                getClientHelper().sendCustomerBudgetUpdate(britishColumbiaCustomerBudgetPort, customerID, price, this);
+                getClientHelper().sendCustomerBudgetUpdate(quebecCustomerBudgetPort, customerID, budget, this);
+                getClientHelper().sendCustomerBudgetUpdate(britishColumbiaCustomerBudgetPort, customerID, budget, this);
                 break;
             case "bc":
-                getClientHelper().sendCustomerBudgetUpdate(britishColumbiaCustomerBudgetPort, customerID, price, this);
-                getClientHelper().sendCustomerBudgetUpdate(quebecCustomerBudgetPort, customerID, price, this);
+                getClientHelper().sendCustomerBudgetUpdate(britishColumbiaCustomerBudgetPort, customerID, budget, this);
+                getClientHelper().sendCustomerBudgetUpdate(quebecCustomerBudgetPort, customerID, budget, this);
                 break;
         }
     }
@@ -146,8 +146,8 @@ public class StoreImpl extends StorePOA {
             itemWaitList.get(itemID).add(customerID);
 
             String logString = ">>" +new SimpleDateFormat("MM/dd/yyyy HH:mm:ssZ").format(new Date())+" << Task SUCCESSFUL: Waitlisted customer:" + customerID + " for the item: "+itemID;
-            Logger.writeStoreLog(this.provinceID, logString);
-            Logger.writeUserLog(customerID, logString);
+            //Logger.writeStoreLog(this.provinceID, logString);
+            //Logger.writeUserLog(customerID, logString);
             isWaitListed = true;
         }
         else {
@@ -156,8 +156,8 @@ public class StoreImpl extends StorePOA {
             itemWaitList.put(itemID, listOfCustomers);
 
             String logString = ">>" +new SimpleDateFormat("MM/dd/yyyy HH:mm:ssZ").format(new Date())+" << Task SUCCESSFUL: Waitlisted customer:" + customerID + " for the item: "+itemID;
-            Logger.writeStoreLog(this.provinceID, logString);
-            Logger.writeUserLog(customerID, logString);
+            //Logger.writeStoreLog(this.provinceID, logString);
+            //Logger.writeUserLog(customerID, logString);
             isWaitListed = true;
         }
         return isWaitListed;

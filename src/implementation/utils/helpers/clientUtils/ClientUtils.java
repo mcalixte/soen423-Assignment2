@@ -121,8 +121,8 @@ public class ClientUtils {
         else
             logString = ">>" +new SimpleDateFormat("MM/dd/yyyy HH:mm:ssZ").format(new Date())+" << Task UNSUCCESSFUL: " + actionType + " Item to Inventory CustomerID: "+customerID+" ItemID: "+itemID;
 
-        Logger.writeUserLog(customerID, logString);
-        Logger.writeStoreLog(provinceID, logString);
+        ////Logger.writeUserLog(customerID, logString);
+        ////Logger.writeStoreLog(provinceID, logString);
     }
 
     public static HashMap<String, List<Item>> getRemoteItemsByName(String itemName, String provinceID) {
@@ -227,8 +227,8 @@ public class ClientUtils {
             System.out.println("Item object received and purchase successful: "+purchaseSuccesfulString);
 
             String logString = ">>" +new SimpleDateFormat("MM/dd/yyyy HH:mm:ssZ").format(new Date())+" << Task SUCCESSFUL: Purchase Item from another store CustomerID: "+customerID+" ItemID: "+itemID;
-            Logger.writeUserLog(customerID, logString);
-            Logger.writeStoreLog(provinceID, logString);
+            ////Logger.writeUserLog(customerID, logString);
+           // //Logger.writeStoreLog(provinceID, logString);
 
             //TODO Log the response
             return purchaseSuccesfulString;

@@ -56,13 +56,13 @@ public class ClientHelper {
             if (store.getCustomerBudgetLog().containsKey(customerID.toLowerCase())) {
                 store.getCustomerBudgetLog().put(customerID.toLowerCase(), store.getCustomerBudgetLog().get(customerID.toLowerCase()) - price);
                 updateCustomerPurchaseLog(customerID, itemID, store, dateOfPurchaseDateObject);
-                store.requestUpdateOfCustomerBudgetLog(customerID, price);
+                store.requestUpdateOfCustomerBudgetLog(customerID, store.getCustomerBudgetLog().get(customerID.toLowerCase()));
             }
             else {
                 Double budget = 1000.00 - price;
                 store.getCustomerBudgetLog().put(customerID.toLowerCase(), budget);
                 updateCustomerPurchaseLog(customerID, itemID, store, dateOfPurchaseDateObject);
-                store.requestUpdateOfCustomerBudgetLog(customerID, price);
+                store.requestUpdateOfCustomerBudgetLog(customerID, store.getCustomerBudgetLog().get(customerID.toLowerCase()));
             }
 
             ClientUtils.log(isItemSuccessfullyPurchased, customerID, itemID, "purchase", this.provinceID);
@@ -119,8 +119,8 @@ public class ClientHelper {
         else
             logString.append(">>" + new SimpleDateFormat("MM/dd/yyyy HH:mm:ssZ").format(new Date()) + " << Task UNSUCCESSFUL: Find Item from local and remote Inventory CustomerID: " + customerID + " Item name: " + itemName + ". No items found.");
 
-        Logger.writeStoreLog(this.provinceID, logString.toString());
-        Logger.writeUserLog(customerID, logString.toString());
+        //Logger.writeStoreLog(this.provinceID, logString.toString());
+        //Logger.writeUserLog(customerID, logString.toString());
 
         return foundItems.toString();
     }
@@ -135,8 +135,8 @@ public class ClientHelper {
                         ClientUtils.returnItemToInventory(itemID, store.getItemLog(), store.getInventory());
 
                         String logString = ">>" + new SimpleDateFormat("MM/dd/yyyy HH:mm:ssZ").format(new Date()) + "<< Task SUCCESSFUL: Return Item to Inventory CustomerID: " + customerID + " ItemID: " + itemID;
-                        Logger.writeUserLog(customerID, logString);
-                        Logger.writeStoreLog(this.provinceID, logString);
+                        //Logger.writeUserLog(customerID, logString);
+                        //Logger.writeStoreLog(this.provinceID, logString);
                         String itemIDToReturn;
                         itemIDToReturn = store.getInventory().get(itemID) != null &&  store.getInventory().get(itemID).size() > 0 ? itemID : "";
 
@@ -144,8 +144,8 @@ public class ClientHelper {
                     } else {
                         System.out.println("Alert: Customer has purchased this item in the past, but item purchase date exceeds 30days");
                         String logString = ">>" + new SimpleDateFormat("MM/dd/yyyy HH:mm:ssZ").format(new Date()) + " << Task UNSUCCESSFUL: Return Item to Inventory CustomerID: " + customerID + " ItemID: " + itemID;
-                        Logger.writeUserLog(customerID, logString);
-                        Logger.writeStoreLog(this.provinceID, logString);
+                        //Logger.writeUserLog(customerID, logString);
+                        //Logger.writeStoreLog(this.provinceID, logString);
 
                         String itemIDToReturn;
                         itemIDToReturn = store.getInventory().get(itemID) != null &&  store.getInventory().get(itemID).size() > 0 ? itemID : "";
@@ -155,21 +155,21 @@ public class ClientHelper {
                 } else {
                     System.out.println("Alert: Customer has past purchases, but NOT of this item");
                     String logString = ">>" + new SimpleDateFormat("MM/dd/yyyy HH:mm:ssZ").format(new Date()) + " << Task UNSUCCESSFUL: Return Item to Inventory CustomerID: " + customerID + " ItemID: " + itemID;
-                    Logger.writeUserLog(customerID, logString);
-                    Logger.writeStoreLog(this.provinceID, logString);
+                    //Logger.writeUserLog(customerID, logString);
+                    //Logger.writeStoreLog(this.provinceID, logString);
                     return itemID+"\n"+false;
                 }
             else {
                 System.out.println("Alert: Customer has no record of past purchases");
                 String logString = ">>" + new SimpleDateFormat("MM/dd/yyyy HH:mm:ssZ").format(new Date()) + " << Task UNSUCCESSFUL: Return Item to Inventory CustomerID: " + customerID + " ItemID: " + itemID;
-                Logger.writeUserLog(customerID, logString);
-                Logger.writeStoreLog(this.provinceID, logString);
+                //Logger.writeUserLog(customerID, logString);
+                //Logger.writeStoreLog(this.provinceID, logString);
                 return itemID+"\n"+false;
             }
         else {
             System.out.println("Alert: Item does not belong to this store...");
             String logString = ">>" + new SimpleDateFormat("MM/dd/yyyy HH:mm:ssZ").format(new Date()) + " << Task UNSUCCESSFUL: Return Item to Inventory CustomerID: " + customerID + " ItemID: " + itemID;
-            Logger.writeUserLog(customerID, logString);
+            //Logger.writeUserLog(customerID, logString);
             return "Alert: Item does not belong to this store..."+"\n"+false;
         }
     }
@@ -188,13 +188,11 @@ public class ClientHelper {
     ////////////////////////////////////
     ///     UDP Related Methods      ///
     ////////////////////////////////////
-    public void sendCustomerBudgetUpdate(int customerBudgetPort, String customerID, double price, StoreImpl store) {
+    public void sendCustomerBudgetUpdate(int customerBudgetPort, String customerID, double budget, StoreImpl store) {
         DatagramSocket serverSocket = null;
         HashMap<String, Double> requestMap = new HashMap<>();
-        Double updatedCustomerBudget = 1000.00;
+        Double updatedCustomerBudget = budget;
 
-        if(store.getCustomerBudgetLog().containsKey(customerID.toLowerCase()))
-            updatedCustomerBudget = store.getCustomerBudgetLog().get(customerID);
         try
         {
             serverSocket = new DatagramSocket();

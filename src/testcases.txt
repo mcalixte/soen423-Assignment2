@@ -18,7 +18,7 @@ Test Case group 2:
 		2.1 Purchase items BC1111 - "TEA"
 			Result: SUCCESS	
 		2.2 Purchase items BC1234 - "LAPTOP"
-			Result: Failed (LIMITED BUDGET)
+			Result: Failed (BOUGHT FROM STORE ALREADY)
 
  
 Test Case group 3:
