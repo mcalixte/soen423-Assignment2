@@ -11,6 +11,7 @@ import java.io.ObjectOutputStream;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -29,7 +30,7 @@ public class ClientHelper {
         String purchasedItem;
         String response;
         if (!ClientUtils.verifyID(customerID, this.provinceID))
-            if (store.getCustomerPurchaseLog().containsKey(customerID)) {
+            if (store.getCustomerPurchaseLog().containsKey(customerID.toLowerCase())) {
                 isItemSuccessfullyPurchased = false;
                 ClientUtils.log(isItemSuccessfullyPurchased, customerID, itemID, "purchase", this.provinceID);
                 return "Task UNSUCCESSFUL: Foreign Customer has purchased from this store once before " + customerID + "," + itemID + "," + dateOfPurchase + "," + "" + isItemSuccessfullyPurchased + "";
@@ -47,8 +48,6 @@ public class ClientHelper {
             }
         }
 
-
-
         purchasedItem = ClientUtils.purchaseSingularItem(itemID, store.getInventory());
         isItemSuccessfullyPurchased = purchasedItem.equalsIgnoreCase("An item of that name does not exist in this store or has been removed") ? false : true;
 
@@ -56,13 +55,13 @@ public class ClientHelper {
             if (store.getCustomerBudgetLog().containsKey(customerID.toLowerCase())) {
                 store.getCustomerBudgetLog().put(customerID.toLowerCase(), store.getCustomerBudgetLog().get(customerID.toLowerCase()) - price);
                 updateCustomerPurchaseLog(customerID, itemID, store, dateOfPurchaseDateObject);
-                store.requestUpdateOfCustomerBudgetLog(customerID, store.getCustomerBudgetLog().get(customerID.toLowerCase()));
+                store.requestUpdateOfCustomerBudgetLog(customerID.toLowerCase(), store.getCustomerBudgetLog().get(customerID.toLowerCase()));
             }
             else {
                 Double budget = 1000.00 - price;
                 store.getCustomerBudgetLog().put(customerID.toLowerCase(), budget);
                 updateCustomerPurchaseLog(customerID, itemID, store, dateOfPurchaseDateObject);
-                store.requestUpdateOfCustomerBudgetLog(customerID, store.getCustomerBudgetLog().get(customerID.toLowerCase()));
+                store.requestUpdateOfCustomerBudgetLog(customerID.toLowerCase(), store.getCustomerBudgetLog().get(customerID.toLowerCase()));
             }
 
             ClientUtils.log(isItemSuccessfullyPurchased, customerID, itemID, "purchase", this.provinceID);
@@ -85,7 +84,20 @@ public class ClientHelper {
     private void updateCustomerPurchaseLog(String customerID, String itemID, StoreImpl store, Date dateOfPurchaseDateObject) {
         HashMap<String, Date> itemIDandDateOfPurchase = new HashMap<>();
         itemIDandDateOfPurchase.put(itemID, dateOfPurchaseDateObject);
-        store.getCustomerPurchaseLog().put(customerID, itemIDandDateOfPurchase);
+        String formattedCustomerID = customerID.toLowerCase();
+        if(store.getCustomerPurchaseLog().containsKey(formattedCustomerID))
+            if(store.getCustomerPurchaseLog().get(formattedCustomerID) != null)
+                store.getCustomerPurchaseLog().get(formattedCustomerID).add(itemIDandDateOfPurchase);
+            else{
+                List<HashMap<String, Date>> list = new ArrayList<>();
+                list.add(itemIDandDateOfPurchase);
+                store.getCustomerPurchaseLog().put(formattedCustomerID, list);
+            }
+        else {
+            List<HashMap<String, Date>> list = new ArrayList<>();
+            list.add(itemIDandDateOfPurchase);
+            store.getCustomerPurchaseLog().put(formattedCustomerID, list);
+        }
     }
 
     private double getSpecificItemPrice(String itemID, StoreImpl store, double price) {
@@ -126,14 +138,22 @@ public class ClientHelper {
     }
 
     public synchronized String returnItem(String customerID, String itemID, String dateOfReturn, StoreImpl store) {
-        Date dateOfReturnDateObject =  DateUtils.createDateFromString(dateOfReturn);
+        Date dateOfReturnDate = null;
+        try {
+            dateOfReturnDate = new SimpleDateFormat("mm/dd/yyyy HH:mm").parse(dateOfReturn);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
         if (ClientUtils.verifyID(itemID, this.provinceID))
-            if (store.getCustomerPurchaseLog().containsKey(customerID))
-                if (store.getCustomerPurchaseLog().get(customerID).containsKey(itemID)) {
-                    if (ClientUtils.isItemReturnWorthy((store.getCustomerPurchaseLog().get(customerID).get(itemID)), dateOfReturn, itemID)) {
-                        store.getCustomerReturnLog().put(customerID, store.getCustomerPurchaseLog().get(customerID));
+            if (store.getCustomerPurchaseLog().containsKey(customerID.toLowerCase()))
+                if (store.getCustomerPurchaseLog().get(customerID.toLowerCase()) != null) {
+                    Date dateOfPurchase = findDateFromCustomerPurchaseLog(customerID, itemID, store);
+                    if (ClientUtils.isItemReturnWorthy(dateOfPurchase, dateOfReturn, itemID)) {
+                        HashMap<String, Date> map = new HashMap<>();
+                        map.put(itemID, dateOfReturnDate);
+                        store.getCustomerReturnLog().put(customerID, map);
                         ClientUtils.returnItemToInventory(itemID, store.getItemLog(), store.getInventory());
-
+                        removeCustomerFromPurchaseLog(customerID, itemID, store);
                         String logString = ">>" + new SimpleDateFormat("MM/dd/yyyy HH:mm:ssZ").format(new Date()) + "<< Task SUCCESSFUL: Return Item to Inventory CustomerID: " + customerID + " ItemID: " + itemID;
                         //Logger.writeUserLog(customerID, logString);
                         //Logger.writeStoreLog(this.provinceID, logString);
@@ -172,6 +192,42 @@ public class ClientHelper {
             //Logger.writeUserLog(customerID, logString);
             return "Alert: Item does not belong to this store..."+"\n"+false;
         }
+    }
+
+    private Date findDateFromCustomerPurchaseLog(String customerID, String itemID, StoreImpl store) {
+        String dateOfPurchase = new SimpleDateFormat("dd/mm/yyyy HH:mm").format(new Date());
+        Date dateOfPurchaseDate = new Date();
+        try {
+            dateOfPurchaseDate = new SimpleDateFormat("dd/mm/yyyy HH:mm").parse(dateOfPurchase);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+
+        for(Map.Entry<String, List<HashMap<String, Date>>> entry : store.getCustomerPurchaseLog().entrySet())
+            if(entry.getKey().equalsIgnoreCase(customerID))
+                if(entry.getValue() != null)
+                    if(entry.getValue().size() > 0)
+                        for(int i = 0; i < entry.getValue().size() - 1; i++)
+                            if(entry.getValue().get(i).containsKey(itemID))
+                                return entry.getValue().get(i).get(itemID);
+
+        return dateOfPurchaseDate;
+    }
+
+    private void removeCustomerFromPurchaseLog(String customerID, String itemID, StoreImpl store) {
+        for(Map.Entry<String, List<HashMap<String, Date>>> entry : store.getCustomerPurchaseLog().entrySet())
+            if(entry.getKey().equalsIgnoreCase(customerID))
+                if(entry.getValue() != null )
+                    if(entry.getValue().size() != 0)
+                        for(int i = 0; i < entry.getValue().size() - 1; i++)
+                            if(entry.getValue().get(i).containsKey(itemID))
+                                entry.getValue().remove(i);
+                    else if(entry.getValue().size() == 0)
+                        store.getCustomerPurchaseLog().remove(customerID);
+                else if(entry.getValue() != null )
+                    store.getCustomerPurchaseLog().remove(customerID);
+
+
     }
 
     public List<Item> getItemsByName(String itemName, HashMap<String, List<Item>> inventory) { List<Item> itemsWithSameName = new ArrayList<>();

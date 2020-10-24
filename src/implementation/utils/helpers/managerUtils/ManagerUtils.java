@@ -117,7 +117,11 @@ public class ManagerUtils {
                         waitlistResponse = "Purchased Item from inventory Customer who was on waitlist: CustomerID:"+entry.getValue().get(i)+" itemID:"+itemID;
                         store.purchaseItem(entry.getValue().get(i), itemID, dateString);
                         store.removeItem(managerID, itemID, 1);
-                        store.getCustomerPurchaseLog().put(entry.getKey(), map);
+
+                        List<HashMap<String, Date>> list = new ArrayList<>();
+                        list.add(map);
+
+                        store.getCustomerPurchaseLog().put(entry.getKey(), list);
                         entry.getValue().remove(i); //Remove that User from the waitlist
 
                         String logString = ">>" +new SimpleDateFormat("MM/dd/yyyy HH:mm:ssZ").format(new Date())+" << Task SUCCESSFUL: Purchased Item from inventory Customer: "+ entry.getKey() +"have now received their items ItemID: "+ itemID;

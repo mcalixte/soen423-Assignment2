@@ -24,15 +24,15 @@ public class ManagerHelper {
             for(int i = 0; i < quantity; i++){
                 item = new Item(itemID, itemName, price);
                 addToStockResponse = ManagerUtils.addToStock(item, store.getInventory());
-                store.getItemLog().add(item);
             }
+            store.getItemLog().add(item);
 
-            String waitListRespoonse = ManagerUtils.handleWaitlistedCustomers(managerID, itemID, price, this.provinceID, store);
+            String waitListResponse = ManagerUtils.handleWaitlistedCustomers(managerID, itemID, price, this.provinceID, store);
 
             String logString = ">>" +new SimpleDateFormat("MM/dd/yyyy HH:mm:ssZ").format(new Date())+" << Task SUCCESSFUL: Add Item to Inventory ManagerID: "+managerID+" ItemID: "+itemID+" ItemName: "+itemName+" Quantity: "+quantity+" Price: "+price;
             //Logger.writeUserLog(managerID, logString);
             //Logger.writeStoreLog(this.provinceID, logString);
-            return addToStockResponse+"\n"+item.toString()+"\n"+waitListRespoonse;
+            return addToStockResponse+"\n"+item.toString()+"\n"+waitListResponse;
         }
         else {
             String logString = ">>" +new SimpleDateFormat("MM/dd/yyyy HH:mm:ssZ").format(new Date())+" << Task UNSUCCESSFUL: Add Item to Inventory ManagerID: "+managerID+" ItemID: "+itemID+" ItemName: "+itemName+" Quantity: "+quantity+" Price: "+price+ "ALERT: You are not permitted to do this action on this store";

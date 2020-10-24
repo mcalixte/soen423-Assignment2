@@ -33,7 +33,7 @@ public class StoreImpl extends StorePOA {
     ///    Store data structures     ///
     ////////////////////////////////////
     private HashMap<String, List<Item>> inventory = new HashMap<>();
-    private HashMap<String, HashMap<String, Date>> customerPurchaseLog = new HashMap<>();
+    private HashMap<String, List<HashMap<String, Date>>> customerPurchaseLog = new HashMap<>();
     private HashMap<String, HashMap<String, Date>> customerReturnLog = new HashMap<>();
     private HashMap<String, Double> customerBudgetLog = new HashMap<>();
     private HashMap<String, List<String>> itemWaitList = new HashMap<>(); //String = itemID, List of customerIDs
@@ -264,7 +264,7 @@ public class StoreImpl extends StorePOA {
     }
     public HashMap<String, List<Item>> getInventory() { return this.inventory; }
     public HashMap<String, Double> getCustomerBudgetLog() { return this.customerBudgetLog; }
-    public HashMap<String, HashMap<String, Date>> getCustomerPurchaseLog() { return this.customerPurchaseLog; }
+    public HashMap<String, List<HashMap<String, Date>>> getCustomerPurchaseLog() { return this.customerPurchaseLog; }
     public HashMap<String, HashMap<String, Date>> getCustomerReturnLog() { return this.customerReturnLog; }
     public List<Item> getItemLog() { return this.itemLog; }
 
