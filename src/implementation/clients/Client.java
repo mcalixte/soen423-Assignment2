@@ -199,7 +199,14 @@ public class Client {
                 newItemID = scanner.nextLine();
                 System.out.println("Enter the required OLD item ID : ");
                 oldItemID = scanner.nextLine();
-                System.out.println("\t\t >>>>>>> Exchange Item result <<<<<<< \n"+ exchangeItem(store, userID, newItemID, oldItemID));
+                System.out.println("Enter the required date string, format \'dd/mm/yyyy HH:mm\' : ");
+                dateString = scanner.nextLine();
+                while (!isDateFormatValid(dateString)) {
+                    System.out.println("Date string invalid, try again...");
+                    System.out.println("Enter the required date string, format \'dd/mm/yyyy HH:mm\' : ");
+                    dateString = scanner.nextLine();
+                }
+                System.out.println("\t\t >>>>>>> Exchange Item result <<<<<<< \n"+ exchangeItem(store, userID, newItemID, oldItemID, dateString));
                 break;
         }
 
@@ -371,7 +378,7 @@ public class Client {
         return returnResponse;
     }
 
-    public static String exchangeItem(Store store, String customerID, String newItemID, String oldItemID) {
-        return store.exchange(customerID, newItemID, oldItemID);
+    public static String exchangeItem(Store store, String customerID, String newItemID, String oldItemID, String dateOfReturn) {
+        return store.exchange(customerID, newItemID, oldItemID, dateOfReturn);
     }
 }

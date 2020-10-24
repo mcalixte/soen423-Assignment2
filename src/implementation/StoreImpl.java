@@ -97,9 +97,10 @@ public class StoreImpl extends StorePOA {
     }
 
     @Override
-    public String exchange(String customerID, String newItemID, String oldItemID) {
+    public String exchange(String customerID, String newItemID, String oldItemID, String dateOfReturn) {
         String dateOfPurchase = new SimpleDateFormat("mm/dd/yyyy HH:mm").format(new Date());
-        String result = returnItem(customerID, oldItemID, dateOfPurchase);
+        
+        String result = returnItem(customerID, oldItemID, dateOfReturn);
 
         boolean isReturnSuccessful = false;
         boolean isPurchaseSuccessful = false;
@@ -107,17 +108,18 @@ public class StoreImpl extends StorePOA {
 
         String[] s = result.split("\n");
         isReturnSuccessful = Boolean.parseBoolean(s[1]);
-
+        System.out.println("MKC1: isReturnSuccessful"+isReturnSuccessful);
         if(isReturnSuccessful) {
             isPurchaseSuccessfulString = purchaseItem(customerID, newItemID, dateOfPurchase);
             isPurchaseSuccessful = isPurchaseSuccessfulString.contains("Task SUCCESSFUL:");
+            System.out.println("MKC1: isPurchaseSuccessful"+isPurchaseSuccessful);
             if(!isPurchaseSuccessful)
                 purchaseItem(customerID, oldItemID, dateOfPurchase);
         }
 
         boolean isExchangeSuccessful = isPurchaseSuccessful && isReturnSuccessful;
 
-        return newItemID+"\n"+oldItemID+"\n"+isExchangeSuccessful;
+        return newItemID+"\n"+oldItemID+"\n"+isExchangeSuccessful+" isPurchaseSuccessful:"+isPurchaseSuccessful+" isReturnSuccessful:"+isReturnSuccessful ;
     }
 
     @Override
