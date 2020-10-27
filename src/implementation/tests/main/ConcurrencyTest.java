@@ -26,8 +26,7 @@ public class ConcurrencyTest {
     }
 
     private static void runTest() {
-        genericManager.start();
-        pause(2000);
+        genericManager.run();
         onClientThread.start();
         qcClientThread.start();
         bcClientThread.start();

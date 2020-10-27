@@ -16,7 +16,8 @@ public class BCClientThread extends Thread  {
     @Override
     public void run() {
         pause(2000);
-        britishColumbiaStore.purchaseItem("ONC1111", "QC1234", "10/25/2020 20:00");
+        String result = britishColumbiaStore.purchaseItem("ONC1111", "QC1234", "25/10/2020 20:00");
+        System.out.println(result);
     }
 
 

@@ -110,7 +110,7 @@ public class ClientHelper {
         return price;
     }
 
-    public String findItem(String customerID, String itemName, HashMap<String, List<Item>> inventory) {
+    public synchronized String findItem(String customerID, String itemName, HashMap<String, List<Item>> inventory) {
         List<Item> locallyFoundItems = new ArrayList<>();
         HashMap<String, List<Item>> remotelyFoundItems = new HashMap<>();
 

@@ -15,10 +15,13 @@ public class QCClientThread extends Thread  {
 
     @Override
     public void run() {
+        StringBuilder response = new StringBuilder();
         pause(1000);
-        quebecStore.purchaseItem("QCC1111", "QC1234", "10/25/2020 20:00");
+        response.append(quebecStore.purchaseItem("QCC1111", "QC1234", "25/10/2020 20:00")+"\n");
+        System.out.println(response.toString());
         pause(2000);
-        quebecStore.exchange("QCC1111", "QC1111", "QC1234","10/25/2020 20:00");
+        response.append(quebecStore.exchange("QCC1111", "QC1111", "QC1234","25/10/2020 20:00")+"\n");
+        System.out.println(response.toString());
     }
 
     private void pause(long time) {

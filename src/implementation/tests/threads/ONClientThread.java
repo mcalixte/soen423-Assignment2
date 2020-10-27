@@ -15,11 +15,16 @@ public class ONClientThread extends Thread  {
 
     @Override
     public void run() {
-        quebecStore.purchaseItem("ONC1111", "QC1234", "10/25/2020 20:00");
+        StringBuilder response = new StringBuilder();
+        response.append(quebecStore.purchaseItem("ONC1111", "QC1234", "25/10/2020 20:00")+"\n");
+        System.out.println(response.toString());
         pause(1000);
-        quebecStore.exchange("ONC1111", "QC1111", "QC1234", "10/25/2020 20:00");
+        response.append(quebecStore.exchange("ONC1111", "QC1111", "QC1234", "25/10/2020 20:00")+"\n");
+        System.out.println(response.toString());
         pause(1000);
-        quebecStore.exchange("ONC1111", "BC1111", "QC1234", "10/25/2020 20:00");
+        response.append(quebecStore.exchange("ONC1111", "BC1111", "QC1234", "25/10/2020 20:00")+"\n");
+        System.out.println(response.toString());
+
     }
 
     private void pause(long time) {

@@ -86,7 +86,7 @@ public class ManagerHelper {
         }
     }
 
-    public String listItemAvailability(String managerID, HashMap<String, List<Item>> inventory) {
+    public synchronized String listItemAvailability(String managerID, HashMap<String, List<Item>> inventory) {
         String returnMessage;
         if(ManagerUtils.verifyID(managerID, this.provinceID)) {
             returnMessage = ManagerUtils.listItems(inventory);
