@@ -71,7 +71,7 @@ public class Client {
             }
         } catch (Exception e) {
             System.out.println("Hello Client exception: " + e);
-            e.printStackTrace();
+           // e.printStackTrace();
         }
     }
 
@@ -338,28 +338,28 @@ public class Client {
     ////////////////////////////////////
 
     public static String addItem(Store store, String managerID, String itemID, String itemName, int quantity, double price) {
-        return store.addItem(managerID, itemID, itemName, quantity, price);
+        return store.addItem(managerID.toLowerCase(), itemID.toLowerCase(), itemName.toLowerCase(), quantity, price);
     }
 
     public static String removeItem(Store store, String managerID, String itemID, int quantity) {
-        return store.removeItem(managerID, itemID, quantity);
+        return store.removeItem(managerID.toLowerCase(), itemID.toLowerCase(), quantity);
     }
 
     public static String listItemAvailability(Store store, String managerID) {
-        return store.listItemAvailability(managerID);
+        return store.listItemAvailability(managerID.toLowerCase());
     }
 
     public static String purchaseItem(Store store, String customerID, String itemID, String dateOfPurchase) {
-        return store.purchaseItem(customerID, itemID, dateOfPurchase);
+        return store.purchaseItem(customerID.toLowerCase(), itemID.toLowerCase(), dateOfPurchase);
     }
 
     public static String findItem(Store store, String customerID, String itemID) {
-        return store.findItem(customerID, itemID);
+        return store.findItem(customerID.toLowerCase(), itemID.toLowerCase());
     }
 
     public static String returnItem(Store store, String customerID, String itemID, String dateOfReturn) {
         String returnResponse = "";
-        returnResponse = store.returnItem(customerID, itemID, dateOfReturn);
+        returnResponse = store.returnItem(customerID.toLowerCase(), itemID.toLowerCase(), dateOfReturn);
 
         String provinceOfItem = itemID.substring(0, 2);
         if(returnResponse.contains("Alert: Item does not belong to this store...")) {
@@ -379,6 +379,6 @@ public class Client {
     }
 
     public static String exchangeItem(Store store, String customerID, String newItemID, String oldItemID, String dateOfReturn) {
-        return store.exchange(customerID, newItemID, oldItemID, dateOfReturn);
+        return store.exchange(customerID.toLowerCase(), newItemID.toLowerCase(), oldItemID.toLowerCase(), dateOfReturn);
     }
 }

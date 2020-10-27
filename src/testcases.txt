@@ -64,13 +64,6 @@ Test Case group 4:
 ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 Test Case group 5: 
-
-	//Exchange for an item that does not exist --> No waitlist, it just fails
-	//Exchange an item late (was purchased more than 30 days ago)
-	//Exchange an item on time (was purchased less than 30 days ago)
-	//Exchange an item but no budget for the new item
-	//Exchange an item with budget for the new item on time --> gets their money back, then buys newItem and updates budget again (we update the budget twice)
-	//If a customer is on a waitlist for ITEM-A, but buys something else and no longer can afford the item, remove them from the waitlist ad give it to some one else who does (if any)
 	
 
 	1. Add Item BCM1111 - BC1234, LAPTOP, 3, 980 
@@ -79,13 +72,16 @@ Test Case group 5:
 	2. As QCM1111 Add QC1234, TEA, 1, 30  
 	3. As QCM1111 Add QC1111, XYZ, 1, 40 
 	
-	4. Purchase items by ONU1111 QC1234 - “TEA” 
+	4. Purchase items by ONC1111 QC1234 - “TEA” "10/25/2020 20:00"
 		Result: Successful QC1234 - “TEA” 
-	5. ONC1111 tries to exchange QC1234 for QC1111
-		Result: Fails, this foreign client has purchased from this store before
-	6. ONC1111 tries to exchange QC1234 for BC1234
+		
+	5. ONC1111 tries to exchange QC1234 for QC1111 "10/27/2020 20:00"
+		Result: Fails, this foreign client has purchased from this store before 
+		
+	6. ONC1111 tries to exchange QC1234 for BC1234 "10/25/2020 20:00"
 		Result: Fails, Customer does not have the budget to buy
-	7. ONC1111 tries to exchange QC1234 for BC1111
+		
+	7. ONC1111 tries to exchange QC1234 for BC1111 "10/25/2020 20:00"
 		Result: Successfull 
 		
 ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------

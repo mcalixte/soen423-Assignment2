@@ -36,7 +36,7 @@ public class Logger {
                 fileWriter.write(output+"\n\n\n");
                 fileWriter.close();
             } catch (IOException e) {
-                e.printStackTrace();
+               // e.printStackTrace();
             }
         }
     }
@@ -60,7 +60,7 @@ public class Logger {
                     fileWriter.write(output+"\n\n\n");
                     fileWriter.close();
                 } catch (IOException e) {
-                    e.printStackTrace();
+                   // e.printStackTrace();
                 }
             }
 
@@ -74,7 +74,7 @@ public class Logger {
                     fileWriter.write(output+"\n\n\n");
                     fileWriter.close();
                 } catch (IOException e) {
-                    e.printStackTrace();
+                   // e.printStackTrace();
                 }
             }
 
@@ -86,7 +86,7 @@ public class Logger {
         try {
             fileWriter = new FileWriter(relativeFilePath + userID + ".txt", true);
         } catch (IOException e) {
-            e.printStackTrace();
+           // e.printStackTrace();
         }
     }
 
@@ -98,7 +98,7 @@ public class Logger {
                 System.out.println("Warning: File already exists.");
             }
         } catch (IOException e) {
-            e.printStackTrace();
+           // e.printStackTrace();
         }
     }
 

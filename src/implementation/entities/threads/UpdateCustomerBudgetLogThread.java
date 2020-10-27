@@ -39,7 +39,7 @@ public class UpdateCustomerBudgetLogThread extends Thread{
                 }
                 System.out.println("Set and updated the customer budget log");
             } catch (IOException | ClassNotFoundException e) {
-                e.printStackTrace();
+               // e.printStackTrace();
             }
 
         }

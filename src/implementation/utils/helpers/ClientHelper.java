@@ -55,12 +55,14 @@ public class ClientHelper {
             if (store.getCustomerBudgetLog().containsKey(customerID.toLowerCase())) {
                 store.getCustomerBudgetLog().put(customerID.toLowerCase(), store.getCustomerBudgetLog().get(customerID.toLowerCase()) - price);
                 updateCustomerPurchaseLog(customerID, itemID, store, dateOfPurchaseDateObject);
+                System.out.println("MKC2: DateOfPurchaseObject: "+dateOfPurchaseDateObject.toString()+" "+dateOfPurchaseDateObject);
                 store.requestUpdateOfCustomerBudgetLog(customerID.toLowerCase(), store.getCustomerBudgetLog().get(customerID.toLowerCase()));
             }
             else {
                 Double budget = 1000.00 - price;
                 store.getCustomerBudgetLog().put(customerID.toLowerCase(), budget);
                 updateCustomerPurchaseLog(customerID, itemID, store, dateOfPurchaseDateObject);
+                System.out.println("MKC2: DateOfPurchaseObject: "+dateOfPurchaseDateObject.toString()+" "+dateOfPurchaseDateObject);
                 store.requestUpdateOfCustomerBudgetLog(customerID.toLowerCase(), store.getCustomerBudgetLog().get(customerID.toLowerCase()));
             }
 
@@ -139,58 +141,72 @@ public class ClientHelper {
 
     public synchronized String returnItem(String customerID, String itemID, String dateOfReturn, StoreImpl store) {
         Date dateOfReturnDate = null;
+        String response = "";
         try {
             dateOfReturnDate = new SimpleDateFormat("mm/dd/yyyy HH:mm").parse(dateOfReturn);
         } catch (ParseException e) {
-            e.printStackTrace();
+           // e.printStackTrace();
         }
         if (ClientUtils.verifyID(itemID, this.provinceID))
             if (store.getCustomerPurchaseLog().containsKey(customerID.toLowerCase()))
                 if (store.getCustomerPurchaseLog().get(customerID.toLowerCase()) != null) {
                     Date dateOfPurchase = findDateFromCustomerPurchaseLog(customerID, itemID, store);
+                    System.out.println("MKC1: dateOfPurchase: "+dateOfPurchase);
                     if (ClientUtils.isItemReturnWorthy(dateOfPurchase, dateOfReturn, itemID)) {
                         HashMap<String, Date> map = new HashMap<>();
                         map.put(itemID, dateOfReturnDate);
                         store.getCustomerReturnLog().put(customerID, map);
                         ClientUtils.returnItemToInventory(itemID, store.getItemLog(), store.getInventory());
                         removeCustomerFromPurchaseLog(customerID, itemID, store);
-                        String logString = ">>" + new SimpleDateFormat("MM/dd/yyyy HH:mm:ssZ").format(new Date()) + "<< Task SUCCESSFUL: Return Item to Inventory CustomerID: " + customerID + " ItemID: " + itemID;
+
+                        Double price = 0.00;
+                        for(Item item : store.getItemLog())
+                            if(item.getItemID().equalsIgnoreCase(itemID))
+                                price = item.getPrice();
+
+                        store.getCustomerBudgetLog().put(customerID.toLowerCase(), store.getCustomerBudgetLog().get(customerID.toLowerCase()) + price);
+                        store.requestUpdateOfCustomerBudgetLog(customerID.toLowerCase(), store.getCustomerBudgetLog().get(customerID.toLowerCase()));
+                        // String logString = ">>" + new SimpleDateFormat("MM/dd/yyyy HH:mm:ssZ").format(new Date()) + "<< Task SUCCESSFUL: Return Item to Inventory CustomerID: " + customerID + " ItemID: " + itemID;
                         //Logger.writeUserLog(customerID, logString);
                         //Logger.writeStoreLog(this.provinceID, logString);
                         String itemIDToReturn;
                         itemIDToReturn = store.getInventory().get(itemID) != null &&  store.getInventory().get(itemID).size() > 0 ? itemID : "";
-
-                        return itemIDToReturn+"\n"+true;
+                        response = "Task SUCCESSFUL: Customer "+ customerID+ " returned Item" + itemID+" on "+ dateOfReturn+" "+true;
+                        return response;
                     } else {
                         System.out.println("Alert: Customer has purchased this item in the past, but item purchase date exceeds 30days");
-                        String logString = ">>" + new SimpleDateFormat("MM/dd/yyyy HH:mm:ssZ").format(new Date()) + " << Task UNSUCCESSFUL: Return Item to Inventory CustomerID: " + customerID + " ItemID: " + itemID;
+                        // String logString = ">>" + new SimpleDateFormat("MM/dd/yyyy HH:mm:ssZ").format(new Date()) + " << Task UNSUCCESSFUL: Return Item to Inventory CustomerID: " + customerID + " ItemID: " + itemID;
                         //Logger.writeUserLog(customerID, logString);
                         //Logger.writeStoreLog(this.provinceID, logString);
 
                         String itemIDToReturn;
                         itemIDToReturn = store.getInventory().get(itemID) != null &&  store.getInventory().get(itemID).size() > 0 ? itemID : "";
 
-                        return itemIDToReturn+"\n"+false;
+                        response = "Task UNSUCCESSFUL: Customer "+ customerID+ " returned Item" + itemID+" on "+ dateOfReturn+"\nAlert: Customer has purchased this item in the past, but item purchase date exceeds 30days";
+                        return response;
                     }
                 } else {
                     System.out.println("Alert: Customer has past purchases, but NOT of this item");
-                    String logString = ">>" + new SimpleDateFormat("MM/dd/yyyy HH:mm:ssZ").format(new Date()) + " << Task UNSUCCESSFUL: Return Item to Inventory CustomerID: " + customerID + " ItemID: " + itemID;
+                    // String logString = ">>" + new SimpleDateFormat("MM/dd/yyyy HH:mm:ssZ").format(new Date()) + " << Task UNSUCCESSFUL: Return Item to Inventory CustomerID: " + customerID + " ItemID: " + itemID;
                     //Logger.writeUserLog(customerID, logString);
                     //Logger.writeStoreLog(this.provinceID, logString);
-                    return itemID+"\n"+false;
+                    response = "Task UNSUCCESSFUL: Customer "+ customerID+ " returned Item" + itemID+" on "+ dateOfReturn+"\n"+"Alert: Customer has past purchases, but NOT of this item";
+                    return response;
                 }
             else {
                 System.out.println("Alert: Customer has no record of past purchases");
-                String logString = ">>" + new SimpleDateFormat("MM/dd/yyyy HH:mm:ssZ").format(new Date()) + " << Task UNSUCCESSFUL: Return Item to Inventory CustomerID: " + customerID + " ItemID: " + itemID;
+                //// String logString = ">>" + new SimpleDateFormat("MM/dd/yyyy HH:mm:ssZ").format(new Date()) + " << Task UNSUCCESSFUL: Return Item to Inventory CustomerID: " + customerID + " ItemID: " + itemID;
                 //Logger.writeUserLog(customerID, logString);
                 //Logger.writeStoreLog(this.provinceID, logString);
-                return itemID+"\n"+false;
+                response = "Task UNSUCCESSFUL: Customer "+ customerID+ " returned Item" + itemID+" on "+ dateOfReturn+"\n"+"Alert: Customer has past purchases, but NOT of this item";;
+                return response;
             }
         else {
             System.out.println("Alert: Item does not belong to this store...");
-            String logString = ">>" + new SimpleDateFormat("MM/dd/yyyy HH:mm:ssZ").format(new Date()) + " << Task UNSUCCESSFUL: Return Item to Inventory CustomerID: " + customerID + " ItemID: " + itemID;
+            //// String logString = ">>" + new SimpleDateFormat("MM/dd/yyyy HH:mm:ssZ").format(new Date()) + " << Task UNSUCCESSFUL: Return Item to Inventory CustomerID: " + customerID + " ItemID: " + itemID;
             //Logger.writeUserLog(customerID, logString);
-            return "Alert: Item does not belong to this store..."+"\n"+false;
+            response = ClientUtils.returnItemToCorrectStore(customerID, itemID, dateOfReturn, provinceID);
+            return response;
         }
     }
 
@@ -200,17 +216,17 @@ public class ClientHelper {
         try {
             dateOfPurchaseDate = new SimpleDateFormat("dd/mm/yyyy HH:mm").parse(dateOfPurchase);
         } catch (ParseException e) {
-            e.printStackTrace();
+           // e.printStackTrace();
         }
 
         for(Map.Entry<String, List<HashMap<String, Date>>> entry : store.getCustomerPurchaseLog().entrySet())
-            if(entry.getKey().equalsIgnoreCase(customerID))
+            if(entry.getKey().equalsIgnoreCase(customerID.toLowerCase()))
                 if(entry.getValue() != null)
                     if(entry.getValue().size() > 0)
-                        for(int i = 0; i < entry.getValue().size() - 1; i++)
-                            if(entry.getValue().get(i).containsKey(itemID))
-                                return entry.getValue().get(i).get(itemID);
-
+                        for(int i = 0; i <= entry.getValue().size() - 1; i++)
+                            if(entry.getValue().get(i).containsKey(itemID.toLowerCase()))
+                                return entry.getValue().get(i).get(itemID.toLowerCase());
+        System.out.println("Returning todays date:"+dateOfPurchaseDate);
         return dateOfPurchaseDate;
     }
 
@@ -226,8 +242,6 @@ public class ClientHelper {
                         store.getCustomerPurchaseLog().remove(customerID);
                 else if(entry.getValue() != null )
                     store.getCustomerPurchaseLog().remove(customerID);
-
-
     }
 
     public List<Item> getItemsByName(String itemName, HashMap<String, List<Item>> inventory) { List<Item> itemsWithSameName = new ArrayList<>();

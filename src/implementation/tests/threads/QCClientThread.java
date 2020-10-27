@@ -18,14 +18,14 @@ public class QCClientThread extends Thread  {
         pause(1000);
         quebecStore.purchaseItem("QCC1111", "QC1234", "10/25/2020 20:00");
         pause(2000);
-        quebecStore.exchange("QCC1111", "QC1111", "QC1234");
+        quebecStore.exchange("QCC1111", "QC1111", "QC1234","10/25/2020 20:00");
     }
 
     private void pause(long time) {
         try {
             Thread.sleep(time);
         } catch (InterruptedException e) {
-            e.printStackTrace();
+           // e.printStackTrace();
         }
     }
 }

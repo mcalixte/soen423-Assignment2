@@ -124,7 +124,7 @@ public class ManagerUtils {
                         store.getCustomerPurchaseLog().put(entry.getKey(), list);
                         entry.getValue().remove(i); //Remove that User from the waitlist
 
-                        String logString = ">>" +new SimpleDateFormat("MM/dd/yyyy HH:mm:ssZ").format(new Date())+" << Task SUCCESSFUL: Purchased Item from inventory Customer: "+ entry.getKey() +"have now received their items ItemID: "+ itemID;
+                        // String logString = ">>" +new SimpleDateFormat("MM/dd/yyyy HH:mm:ssZ").format(new Date())+" << Task SUCCESSFUL: Purchased Item from inventory Customer: "+ entry.getKey() +"have now received their items ItemID: "+ itemID;
                         //Logger.writeUserLog(managerID, logString);
                         //Logger.writeUserLog(entry.getKey(), logString);
                         //Logger.writeStoreLog(provinceID, logString);

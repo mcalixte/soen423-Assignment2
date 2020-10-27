@@ -24,7 +24,7 @@ public class BCClientThread extends Thread  {
         try {
             Thread.sleep(time);
         } catch (InterruptedException e) {
-            e.printStackTrace();
+           // e.printStackTrace();
         }
     }
 }

@@ -17,15 +17,19 @@ public class ClientUtils {
     ////////////////////////////////////
     ///       UDP Related Ports      ///
     ////////////////////////////////////
+
     private static int quebecPurchaseItemUDPPort = 30000;
     private static int quebecListItemUDPPort = 30001;
+    private static int quebecReturnUDPPort = 30003;
 
-    private static int britishColumbiaPurchaseItemUDPPort = 30003;
-    private static int britishColumbiaListItemUDPPort = 30004;
+    private static int britishColumbiaPurchaseItemUDPPort = 30004;
+    private static int britishColumbiaListItemUDPPort = 30005;
+    private static int britishColumbiaReturnUDPPort = 30007;
 
-    private static int ontarioPurchaseItemUDPPort = 30006;
-    private static int ontarioListItemUDPPort = 30007;
-    
+    private static int ontarioPurchaseItemUDPPort = 30008;
+    private static int ontarioListItemUDPPort = 30009;
+    private static int ontarioReturnUDPPort = 30011;
+
     public static boolean verifyID(String genericID, String provinceID) {
         return genericID.toLowerCase().replace(" ", "").contains(provinceID.toLowerCase().replace(" ",""));
     }
@@ -75,6 +79,23 @@ public class ClientUtils {
         return purchaseSuccesful;
     }
 
+    public static String returnItemToCorrectStore(String customerID, String itemID, String dateOfPurchase, String provinceID) {
+        String returnSuccesful = "";
+        if(itemID.toLowerCase().contains("qc")){
+            returnSuccesful = requestItemOverUDP(quebecReturnUDPPort,customerID, itemID, dateOfPurchase,provinceID);
+        }
+        else if(itemID.toLowerCase().contains("on")){
+            returnSuccesful = requestItemOverUDP(ontarioReturnUDPPort,customerID, itemID, dateOfPurchase,provinceID);
+        }
+        else if(itemID.toLowerCase().contains("bc")){
+            returnSuccesful = requestItemOverUDP(britishColumbiaReturnUDPPort,customerID, itemID, dateOfPurchase, provinceID);
+        }
+
+        return returnSuccesful;
+    }
+
+
+
     public static List<Item> mergeAllFoundItems(List<Item> locallyFoundItems, HashMap<String, List<Item>> remotelyFoundItems) {
         List<Item> allItems = new ArrayList<>();
         if(locallyFoundItems == null && remotelyFoundItems == null)
@@ -115,11 +136,11 @@ public class ClientUtils {
     }
 
     public static void log(Boolean itemSuccessfullyPurchased, String customerID, String itemID, String actionType, String provinceID) {
-        String logString = "";
-        if(itemSuccessfullyPurchased)
-            logString = ">>" +new SimpleDateFormat("MM/dd/yyyy HH:mm:ssZ").format(new Date())+" << Task SUCCESSFUL:" + actionType +"Item to Inventory CustomerID: "+customerID+" ItemID: "+itemID;
-        else
-            logString = ">>" +new SimpleDateFormat("MM/dd/yyyy HH:mm:ssZ").format(new Date())+" << Task UNSUCCESSFUL: " + actionType + " Item to Inventory CustomerID: "+customerID+" ItemID: "+itemID;
+        // String logString = "";
+        if(itemSuccessfullyPurchased) {}
+            //logString = ">>" +new SimpleDateFormat("MM/dd/yyyy HH:mm:ssZ").format(new Date())+" << Task SUCCESSFUL:" + actionType +"Item to Inventory CustomerID: "+customerID+" ItemID: "+itemID;
+        else {}
+            //logString = ">>" +new SimpleDateFormat("MM/dd/yyyy HH:mm:ssZ").format(new Date())+" << Task UNSUCCESSFUL: " + actionType + " Item to Inventory CustomerID: "+customerID+" ItemID: "+itemID;
 
         ////Logger.writeUserLog(customerID, logString);
         ////Logger.writeStoreLog(provinceID, logString);
@@ -201,7 +222,7 @@ public class ClientUtils {
     private static String requestItemOverUDP(int storePort, String customerID, String itemID, String dateOfPurchase, String provinceID) { //Sending out requests to purchase items
         DatagramSocket socket = null;
         String requestString;
-        String purchaseSuccesfulString = "";
+        String responseString = "";
         try
         {
             socket = new DatagramSocket();
@@ -222,30 +243,30 @@ public class ClientUtils {
             ByteArrayInputStream in = new ByteArrayInputStream(data);
             ObjectInputStream is = new ObjectInputStream(in);
 
-            purchaseSuccesfulString = (String) is.readObject();
+            responseString = (String) is.readObject();
             is.close();
-            System.out.println("Item object received and purchase successful: "+purchaseSuccesfulString);
+            System.out.println("Item object received and purchase successful: "+responseString);
 
-            String logString = ">>" +new SimpleDateFormat("MM/dd/yyyy HH:mm:ssZ").format(new Date())+" << Task SUCCESSFUL: Purchase Item from another store CustomerID: "+customerID+" ItemID: "+itemID;
+            // String logString = ">>" +new SimpleDateFormat("MM/dd/yyyy HH:mm:ssZ").format(new Date())+" << Task SUCCESSFUL: Purchase Item from another store CustomerID: "+customerID+" ItemID: "+itemID;
             ////Logger.writeUserLog(customerID, logString);
            // //Logger.writeStoreLog(provinceID, logString);
 
             //TODO Log the response
-            return purchaseSuccesfulString;
+            return responseString;
         }
         catch(Exception e)
         {
             System.err.println("Could not effectuate request item over UDP due to a socket error... Restart process of purchase or finding...");
 
         }
-        return purchaseSuccesfulString;
+        return responseString;
     }
 
-    private static String packageRequestAsString(String customerID, String itemID, String dateOfPurchase) {
+    private static String packageRequestAsString(String customerID, String itemID, String date) {
         StringBuilder requestMessage = new StringBuilder();
         requestMessage.append(customerID+"\n");
         requestMessage.append(itemID+"\n");
-        requestMessage.append(dateOfPurchase+"\n");
+        requestMessage.append(date+"\n");
 
         return requestMessage.toString();
     }

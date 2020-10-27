@@ -61,7 +61,7 @@ public class ConcurrencyTest {
         try {
             Thread.sleep(time);
         } catch (InterruptedException e) {
-            e.printStackTrace();
+           // e.printStackTrace();
         }
     }
 }

@@ -4,6 +4,7 @@ import StoreApp.StorePOA;
 import implementation.entities.item.Item;
 import implementation.entities.threads.ListItemThread;
 import implementation.entities.threads.PurchaseItemThread;
+import implementation.entities.threads.ReturnItemThread;
 import implementation.entities.threads.UpdateCustomerBudgetLogThread;
 import implementation.utils.helpers.ClientHelper;
 import implementation.utils.helpers.ManagerHelper;
@@ -46,14 +47,17 @@ public class StoreImpl extends StorePOA {
     private static int quebecPurchaseItemUDPPort = 30000;
     private static int quebecListItemUDPPort = 30001;
     private static int quebecCustomerBudgetPort = 30002;
+    private static int quebecReturnUDPPort = 30003;
 
-    private static int britishColumbiaPurchaseItemUDPPort = 30003;
-    private static int britishColumbiaListItemUDPPort = 30004;
-    private static int britishColumbiaCustomerBudgetPort = 30005;
+    private static int britishColumbiaPurchaseItemUDPPort = 30004;
+    private static int britishColumbiaListItemUDPPort = 30005;
+    private static int britishColumbiaCustomerBudgetPort = 30006;
+    private static int britishColumbiaReturnUDPPort = 30007;
 
-    private static int ontarioPurchaseItemUDPPort = 30006;
-    private static int ontarioListItemUDPPort = 30007;
-    private static int ontarioCustomerBudgetPort = 30008;
+    private static int ontarioPurchaseItemUDPPort = 30008;
+    private static int ontarioListItemUDPPort = 30009;
+    private static int ontarioCustomerBudgetPort = 30010;
+    private static int ontarioReturnUDPPort = 30011;
 
 
     public StoreImpl(String provinceID) {
@@ -106,9 +110,9 @@ public class StoreImpl extends StorePOA {
         boolean isPurchaseSuccessful = false;
         String isPurchaseSuccessfulString = "";
 
-        String[] s = result.split("\n");
-        isReturnSuccessful = Boolean.parseBoolean(s[1]);
-        System.out.println("MKC1: isReturnSuccessful"+isReturnSuccessful);
+        isReturnSuccessful = result.contains("Task SUCCESSFUL:");
+        System.out.println("MKC1: isReturnSuccessful "+isReturnSuccessful);
+
         if(isReturnSuccessful) {
             isPurchaseSuccessfulString = purchaseItem(customerID, newItemID, dateOfPurchase);
             isPurchaseSuccessful = isPurchaseSuccessfulString.contains("Task SUCCESSFUL:");
@@ -147,7 +151,7 @@ public class StoreImpl extends StorePOA {
         if(itemWaitList.containsKey(itemID)) {
             itemWaitList.get(itemID).add(customerID);
 
-            String logString = ">>" +new SimpleDateFormat("MM/dd/yyyy HH:mm:ssZ").format(new Date())+" << Task SUCCESSFUL: Waitlisted customer:" + customerID + " for the item: "+itemID;
+            // String logString = ">>" +new SimpleDateFormat("MM/dd/yyyy HH:mm:ssZ").format(new Date())+" << Task SUCCESSFUL: Waitlisted customer:" + customerID + " for the item: "+itemID;
             //Logger.writeStoreLog(this.provinceID, logString);
             //Logger.writeUserLog(customerID, logString);
             isWaitListed = true;
@@ -157,7 +161,7 @@ public class StoreImpl extends StorePOA {
             listOfCustomers.add(customerID);
             itemWaitList.put(itemID, listOfCustomers);
 
-            String logString = ">>" +new SimpleDateFormat("MM/dd/yyyy HH:mm:ssZ").format(new Date())+" << Task SUCCESSFUL: Waitlisted customer:" + customerID + " for the item: "+itemID;
+            // String logString = ">>" +new SimpleDateFormat("MM/dd/yyyy HH:mm:ssZ").format(new Date())+" << Task SUCCESSFUL: Waitlisted customer:" + customerID + " for the item: "+itemID;
             //Logger.writeStoreLog(this.provinceID, logString);
             //Logger.writeUserLog(customerID, logString);
             isWaitListed = true;
@@ -181,17 +185,41 @@ public class StoreImpl extends StorePOA {
                 openListItemUDPPort(ontarioListItemUDPPort);
                 openPurchaseItemUDPPort(ontarioPurchaseItemUDPPort);
                 openUpdateCustomerBudgetLogUDPPort(ontarioCustomerBudgetPort);
+                openReturnUDPPort(ontarioReturnUDPPort);
                 break;
             case "qc":
                 openListItemUDPPort(quebecListItemUDPPort);
                 openPurchaseItemUDPPort(quebecPurchaseItemUDPPort);
                 openUpdateCustomerBudgetLogUDPPort(quebecCustomerBudgetPort);
+                openReturnUDPPort(quebecReturnUDPPort);
                 break;
             case "bc":
                 openListItemUDPPort(britishColumbiaListItemUDPPort);
                 openPurchaseItemUDPPort(britishColumbiaPurchaseItemUDPPort);
                 openUpdateCustomerBudgetLogUDPPort(britishColumbiaCustomerBudgetPort);
+                openReturnUDPPort(britishColumbiaReturnUDPPort);
                 break;
+        }
+    }
+
+    private void openReturnUDPPort(int returnUDPPort) {
+        DatagramSocket serverSocket = null;
+        try {
+            System.out.printf("Listening on udp:%s:%d%n", InetAddress.getLocalHost().getHostAddress(), returnUDPPort);
+            serverSocket = new DatagramSocket(returnUDPPort);
+            System.out.println("Return Item UPD port: "+ returnUDPPort);
+            byte[] receiveData = new byte[1024];
+
+            // System.out.println("Opening purchase UDP port"+updPort+"for store");
+            DatagramPacket receivePacket = new DatagramPacket(receiveData, receiveData.length);
+            ReturnItemThread thread = new ReturnItemThread(serverSocket, receivePacket, this);
+            thread.start();
+
+        } catch (Exception e) {
+            System.out.println("Trouble when running openReturnUDPPort \n"+ e);
+           // e.printStackTrace();
+        } finally {
+            //  serverSocket.close();
         }
     }
 
@@ -209,7 +237,7 @@ public class StoreImpl extends StorePOA {
             thread.start();
         } catch (Exception e) {
             System.out.println("openListItemUDPPort \n"+ e);
-            e.printStackTrace();
+           // e.printStackTrace();
         } finally {
             //serverSocket.close();
         }
@@ -223,7 +251,6 @@ public class StoreImpl extends StorePOA {
             System.out.println("Purchase Item UPD port: "+ updPort);
             byte[] receiveData = new byte[1024];
 
-            System.out.printf("Listening on udp:%s:%d%n", InetAddress.getLocalHost().getHostAddress(), updPort);
             // System.out.println("Opening purchase UDP port"+updPort+"for store");
             DatagramPacket receivePacket = new DatagramPacket(receiveData, receiveData.length);
             PurchaseItemThread thread = new PurchaseItemThread(serverSocket, receivePacket, this);
@@ -231,7 +258,7 @@ public class StoreImpl extends StorePOA {
 
         } catch (Exception e) {
             System.out.println("openPurchaseItemUDPPort \n"+ e);
-            e.printStackTrace();
+           // e.printStackTrace();
         } finally {
             //  serverSocket.close();
         }
@@ -252,7 +279,7 @@ public class StoreImpl extends StorePOA {
 
         } catch (Exception e) {
             System.out.println("openUpdateCustomerBudgetLogUDPPort \n"+ e);
-            e.printStackTrace();
+           // e.printStackTrace();
         } finally {
             //  serverSocket.close();
         }
